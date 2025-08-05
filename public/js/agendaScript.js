@@ -5,7 +5,7 @@ const proximo = document.getElementById('proximo');
 const calendario = document.getElementById('calendario');
 const sobreposicao = document.getElementById('sobreposicao');
 const fecharSobreposicao = document.querySelector('.fechar-sobreposicao');
-const dataAgendamento = document.getElementById('dataAgendamento');
+const dataAgendamento = document.getElementById('data');
 
 let dataAtual = new Date();
 let mesAtual = dataAtual.getMonth();
@@ -61,12 +61,51 @@ proximo.addEventListener('click', () => {
   mostrarCalendario(mesAtual, anoAtual);
 });
 
-calendario.addEventListener('click', (evento) => {
+document.addEventListener('DOMContentLoaded', () => {
+    const selectHora = document.getElementById('hora');
+    if (selectHora) {
+        const horaMin = 8;
+        const horaMax = 18;
+        const step = 30; // minutos
 
-    if (evento.target.tagName === 'TD' && evento.target.textContent !== '') {
-        sobreposicao.style.display = 'flex';
+        for (let h = horaMin; h <= horaMax; h++) {
+            for (let m = 0; m < 60; m += step) {
+                // Não adicionar 18:30, 18:30+ etc, só até 18:00
+                if (h === horaMax && m > 0) continue;
+                const horaStr = String(h).padStart(2, '0');
+                const minStr = String(m).padStart(2, '0');
+                const value = `${horaStr}:${minStr}`;
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                selectHora.appendChild(option);
+            }
+        }
     }
+});
+
+// calendario.addEventListener('click', (evento) => {
+
+//     if (evento.target.tagName === 'TD' && evento.target.textContent !== '') {
+//         sobreposicao.style.display = 'flex';
+//     }
     
+// });
+
+calendario.addEventListener('click', (evento) => {
+    if (
+        evento.target.tagName === 'TD' &&
+        evento.target.textContent !== '' &&
+        !evento.target.classList.contains('mes-anterior') &&
+        !evento.target.classList.contains('mes-posterior')
+    ) {
+        sobreposicao.style.display = 'flex';
+        const diaClicado = evento.target.textContent.padStart(2, '0');
+        const dataFormatada = `${anoAtual}-${String(mesAtual + 1).padStart(2, '0')}-${diaClicado}`;
+        if (dataAgendamento) {
+            dataAgendamento.value = dataFormatada;
+        }
+    }
 });
 
 fecharSobreposicao.addEventListener('click', () => {
