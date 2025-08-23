@@ -19,15 +19,15 @@ main {
 h1 {
     text-align: center;
     color: #d87093;
-    margin-bottom: 30px;
-    font-size: 2.5em;
+    /* margin-bottom: 30px; */
+    /* font-size: 2.5em; */
     font-weight: 300;
 }
 
 h4 {
     text-align: center;
     color: #d87093;
-    margin-bottom: 30px;
+    /* margin-bottom: 30px; */
     /* font-size: 2.5em; */
     font-weight: 300;
 }
@@ -365,8 +365,9 @@ body::before {
 /* Calendário */
 
 .calendario {
-    display: inline;
-    width: 300px;
+    /* display: inline; */
+    /* width: 300px; */
+    max-width: 85%;
     border: 1px solid #eee;
     border-radius: 8px;
     font-family: 'Segoe UI', sans-serif;
@@ -377,7 +378,7 @@ body::before {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
+    padding: 10px;
     background-color: transparent; /* Remove o fundo branco */
   }
   
@@ -426,7 +427,7 @@ body::before {
   }
   
   th, td {
-    padding: 12px;
+    padding: 10px;
     text-align: center;
     border: 1px solid #eee;
   }
