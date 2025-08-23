@@ -68,10 +68,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const horaMax = 18;
         const step = 30; // minutos
 
+        // Defina aqui o intervalo de almoço (exemplo: das 12:00 às 13:00,para esconder 12 e 12:30)
+        const almocoInicio = "12:00";
+        const almocoFim = "13:00";
+
+        function estaNoIntervaloAlmoco(hora, min) {
+            const horario = `${String(hora).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+            return horario >= almocoInicio && horario < almocoFim;
+        }
+
         for (let h = horaMin; h <= horaMax; h++) {
             for (let m = 0; m < 60; m += step) {
                 // Não adicionar 18:30, 18:30+ etc, só até 18:00
                 if (h === horaMax && m > 0) continue;
+                // Valida Horario de almoço
+                if (estaNoIntervaloAlmoco(h, m)) continue;
+
                 const horaStr = String(h).padStart(2, '0');
                 const minStr = String(m).padStart(2, '0');
                 const value = `${horaStr}:${minStr}`;

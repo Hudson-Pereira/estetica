@@ -133,7 +133,7 @@ router.get('/infos', async (req, res) => {
       throw new Error("Erro!!!!");
     }
 })
-//TODO: criar funcao externa para formatar data e filtrar agenda
+//TODO: criar funcao externa/exportada para formatar data e filtrar agenda
 router.post('/search', async (req, res) => {
     try {
         let {search} = req.body

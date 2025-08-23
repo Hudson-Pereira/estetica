@@ -24,8 +24,18 @@ h1 {
     font-weight: 300;
 }
 
+h4 {
+    text-align: center;
+    color: #d87093;
+    margin-bottom: 30px;
+    /* font-size: 2.5em; */
+    font-weight: 300;
+}
 /* Agenda */
 .agenda{
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza os itens na vertical */
     width: 90%; /* Largura da seção */
     margin: 20px auto; /* Centraliza a seção */
     font-family: Arial, sans-serif; /* Fonte padrão */
@@ -41,14 +51,23 @@ h1 {
 
 #dados {
     display: inline-block; /* Exibe os cards lado a lado */
-    width: 15%; /* Largura dos cards (ajuste conforme necessário) */
-    margin: 10px; /* Espaço entre os cards */
+    min-width: 15%; /* Largura dos cards (ajuste conforme necessário) */
+    margin: 20px 10px; /* Espaço entre os cards */
     padding: 15px;
     background-color: #fffefe; /* Cor de fundo dos dados */
     border: 1px solid #f8bbd0; /* Borda dos dados */
     border-radius: 8px; /* Borda arredondada */
     box-sizing: border-box; /* Garante que padding e border não alterem a largura */
     vertical-align: top;
+}
+
+.linha-cards{
+    display: flex; /* Exibe os cards em linha */
+    /* flex-wrap: wrap; Permite que os cards quebrem para a próxima linha */
+    justify-content: center; /* Centraliza os cards horizontalmente */
+    gap: 20px; /* Espaço entre os cards */
+    margin-bottom: 20px;
+    flex-wrap: nowrap;
 }
 
 #detalhes {
@@ -520,9 +539,10 @@ body::before {
 
 #divBusca {
     display: flex;
+    justify-content: center;
     align-items: center;
     margin: 20px auto; /* Centraliza horizontalmente e adiciona margem */
-    max-width: 400px; /* Define uma largura máxima */
+    max-width: 100%; /* Define uma largura máxima */
 }
 
 #txtBusca {
