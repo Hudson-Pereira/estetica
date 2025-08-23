@@ -3,7 +3,7 @@ const LocalStrategy = require('passport-local').Strategy;
  
 const users = [{ 
     _id: 1, 
-    username: "lisa", 
+    username: "estetica", 
     password: "$2a$06$HT.EmXYUUhNo3UQMl9APmeC0SwoGsx7FtMoAWdzGicZJ4wR1J8alW",
     email: "hudson.o.pereira@gmail.com"
 }];
