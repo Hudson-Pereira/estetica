@@ -1,6 +1,12 @@
 generator client {
   provider = "prisma-client-js"
 }
+//testando no delular o generator abaixo
+//generator client {
+//  provider      = "prisma-client-js"
+//  binaryTargets = ["native", "linux-arm64-openssl-1.1.x"]
+//}
+
 
 datasource db {
   provider = "mongodb"

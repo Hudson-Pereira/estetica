@@ -1,10 +1,12 @@
+require('dotenv').config()
 const express = require("express");
 const session = require("express-session");
 const MemoryStore = require('memorystore')(session);
 const path = require("path");
 const { PrismaClient } = require("@prisma/client");
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000
+
 const prisma = new PrismaClient();
 
 const passport = require("passport");
@@ -61,6 +63,10 @@ app.use("/caixa", authenticationMiddleware, CaixaRouter);
 const ClienteRouter = require("./routers/clientes.routes");
 app.use("/cliente", ClienteRouter)
 
-app.listen(process.env.PORT, () => {
+/*app.listen(process.env.PORT, () => {
   console.log(`Rodando em http://localhost:${port}.`);
+});*/
+//teste celular
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Servidor rodando em http://localhost:${port}`);
 });
