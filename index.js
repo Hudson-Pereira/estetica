@@ -3,11 +3,9 @@ const express = require("express");
 const session = require("express-session");
 const MemoryStore = require('memorystore')(session);
 const path = require("path");
-const { PrismaClient } = require("@prisma/client");
 
 const port = process.env.PORT || 3000
-
-const prisma = new PrismaClient();
+const sessionSecret = process.env.SESSION_SECRET || '123';
 
 const passport = require("passport");
 
@@ -22,14 +20,14 @@ app.use(session({
         checkPeriod: 1800000,
         ttl: 3600000
     }),
-    secret: '123',
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 60 * 60 * 1000}
 }))
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.static(path.join("./")));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 

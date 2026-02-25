@@ -3,9 +3,9 @@ const LocalStrategy = require('passport-local').Strategy;
  
 const users = [{ 
     _id: 1, 
-    username: "estetica", 
-    password: "$2a$06$HT.EmXYUUhNo3UQMl9APmeC0SwoGsx7FtMoAWdzGicZJ4wR1J8alW",
-    email: "hudson.o.pereira@gmail.com"
+    username: process.env.ADMIN_USERNAME || "estetica",
+    password: process.env.ADMIN_PASSWORD_HASH || "$2a$06$HT.EmXYUUhNo3UQMl9APmeC0SwoGsx7FtMoAWdzGicZJ4wR1J8alW",
+    email: process.env.ADMIN_EMAIL || "admin@example.com"
 }];
  
 module.exports = function(passport){
