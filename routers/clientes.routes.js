@@ -76,7 +76,7 @@ router.post('/agenda/add', async (req, res) => {
         const verifyIfExists = await prisma.agenda.findMany({where: {data: data, hora: hora}})
 
         if (verifyIfExists.length !== 0){
-            return res.status(200).render('clientes/addAgenda', {message: `Horário não disponíve!!`});
+            return res.status(200).render('clientes/addAgenda', {message: `Horario nao disponivel!!`});
         }
 
         if (!preco) preco = 0;
