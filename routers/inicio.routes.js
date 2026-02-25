@@ -9,8 +9,7 @@ router.get("/", async (req, res) => {
     try {
       let hoje = new Date();
       const dia = hoje.getDate().toString().padStart(2,"0");
-      let mes = hoje.getMonth() + 1
-      if(mes.length !== 2) mes = `0${mes}`
+      const mes = (hoje.getMonth() + 1).toString().padStart(2, "0");
       const ano = hoje.getFullYear();
   
       hoje = `${ano}-${mes}-${dia}`;
@@ -22,8 +21,8 @@ router.get("/", async (req, res) => {
       produtos = produtos.filter((produto) => {
         if (produto.data > hoje) {
           
-          const mesP = parseInt(produto.data.slice(5, 8).toString());
-          const mesA = parseInt(hojeS.slice(5, 8));
+          const mesP = parseInt(produto.data.slice(5, 7).toString());
+          const mesA = parseInt(hojeS.slice(5, 7));
           const anoP = parseInt(produto.data.slice(0, 4).toString())
           const anoA = parseInt(hojeS.slice(0, 4));
           if (anoP >= anoA) {
