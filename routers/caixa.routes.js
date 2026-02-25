@@ -15,27 +15,30 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
     try {
-        let dataI = req.body.dataI;
-        let dataF = req.body.dataF;
+        const dataIString = req.body.dataI;
+        const dataFString = req.body.dataF;
         const servicos = await prisma.agenda.findMany({})
         const produtos = await prisma.produtos.findMany({})
 
         let entrada = 0
         let saida = 0
+
+        let dataI = dataIString.split('-')
+        dataI = new Date(dataI[0], dataI[1] -1, dataI[2])
+        let dataF = dataFString.split('-')
+        dataF = new Date(dataF[0], dataF[1] -1, dataF[2])
+        
         servicos.filter((servico) => {
-            if (servico.data >= dataI && servico.data <= dataF) {
+            const [dia, mes, ano] = servico.data.split('/');
+            const dataServico = new Date(ano, mes - 1, dia);
+
+            if (dataServico >= dataI && dataServico <= dataF) {
                 entrada = entrada + servico.preco
             }
         });
 
-        dataI = dataI.split('-')
-        dataI = new Date(dataI[0], dataI[1] -1, dataI[2])
-        dataF = dataF.split('-')
-        dataF = new Date(dataF[0], dataF[1] -1, dataF[2])
-        
         produtos.filter((produto) => {
-            
-            if (produto.createdAt >= dataI || produto.createAt <= dataF) {
+            if (produto.createdAt >= dataI && produto.createdAt <= dataF) {
                 saida = saida + produto.valor
             }
         })
