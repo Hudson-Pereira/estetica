@@ -36,21 +36,19 @@
 </main> -->
 <main class="agenda">
     <h1>Agendamentos</h1>
-    <% for (let i = 0; i < agenda.length; i += 5) { %>
-        <div class="linha-cards">
-            <% for (let j = i; j < i + 5 && j < agenda.length; j++) { %>
-                <section id="dados">
-                    <div id="detalhes">
-                        <div id="dadosAgenda">
-                            <div><%= agenda[j].nome %></div>
-                            <div><%= agenda[j].data %></div>
-                            <div><%= agenda[j].hora %></div>
-                        </div>
+    <div class="linha-cards">
+        <% agenda.forEach(item => { %>
+            <section id="dados">
+                <div id="detalhes">
+                    <div id="dadosAgenda">
+                        <div><%= item.nome %></div>
+                        <div><%= item.data %></div>
+                        <div><%= item.hora %></div>
                     </div>
-                </section>
-            <% } %>
-        </div>
-    <% } %>
+                </div>
+            </section>
+        <% }) %>
+    </div>
 </main>
 
     <%- include('../includes/clientFooter'); %>

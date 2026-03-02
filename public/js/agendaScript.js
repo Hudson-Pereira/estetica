@@ -6,6 +6,7 @@ const calendario = document.getElementById('calendario');
 const sobreposicao = document.getElementById('sobreposicao');
 const fecharSobreposicao = document.querySelector('.fechar-sobreposicao');
 const dataAgendamento = document.getElementById('data');
+const diasFuncionamento = [1, 2, 3, 4, 5]; // segunda a sexta
 
 let dataAtual = new Date();
 let mesAtual = dataAtual.getMonth();
@@ -30,7 +31,9 @@ function mostrarCalendario(mes, ano) {
       linha.innerHTML += `<td class="mes-posterior">${diaPosterior}</td>`;
       data++;
     } else {
-      linha.innerHTML += `<td>${data}</td>`;
+      const diaSemana = new Date(ano, mes, data).getDay();
+      const classeDiaFechado = diasFuncionamento.includes(diaSemana) ? '' : 'dia-fechado';
+      linha.innerHTML += `<td class="${classeDiaFechado}">${data}</td>`;
       data++;
     }
 
@@ -109,7 +112,8 @@ calendario.addEventListener('click', (evento) => {
         evento.target.tagName === 'TD' &&
         evento.target.textContent !== '' &&
         !evento.target.classList.contains('mes-anterior') &&
-        !evento.target.classList.contains('mes-posterior')
+        !evento.target.classList.contains('mes-posterior') &&
+        !evento.target.classList.contains('dia-fechado')
     ) {
         sobreposicao.style.display = 'flex';
         const diaClicado = evento.target.textContent.padStart(2, '0');

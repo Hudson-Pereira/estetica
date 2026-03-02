@@ -50,9 +50,8 @@ h4 {
 }
 
 #dados {
-    display: inline-block; /* Exibe os cards lado a lado */
-    min-width: 15%; /* Largura dos cards (ajuste conforme necessário) */
-    margin: 20px 10px; /* Espaço entre os cards */
+    width: 100%;
+    margin: 0;
     padding: 15px;
     background-color: #fffefe; /* Cor de fundo dos dados */
     border: 1px solid #f8bbd0; /* Borda dos dados */
@@ -62,12 +61,11 @@ h4 {
 }
 
 .linha-cards{
-    display: flex; /* Exibe os cards em linha */
-    /* flex-wrap: wrap; Permite que os cards quebrem para a próxima linha */
-    justify-content: center; /* Centraliza os cards horizontalmente */
-    gap: 20px; /* Espaço entre os cards */
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 20px;
     margin-bottom: 20px;
-    flex-wrap: nowrap;
 }
 
 #detalhes {
@@ -453,6 +451,16 @@ body::before {
   }
 
 /* Sobreposição */
+  td.dia-fechado {
+    background-color: #f1f1f1;
+    color: #b1b1b1;
+    cursor: not-allowed;
+  }
+
+  td.dia-fechado:hover {
+    background-color: #f1f1f1;
+  }
+
   .sobreposicao {
     display: none;
     position: fixed;
@@ -640,8 +648,8 @@ body::before {
     .carousel-nav button {
         font-size: 1.5em;
     }
-    #dados{
-        width: 25%;
+    .linha-cards {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
@@ -653,7 +661,7 @@ body::before {
         width: 120px;
         height: 80px;
     }
-    #dados{
-        width: 40%;
+    .linha-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
