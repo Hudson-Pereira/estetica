@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { toISODateString } = require('../utils/date');
 
 const {PrismaClient} = require('@prisma/client');
 const prisma = new PrismaClient()
@@ -23,16 +24,13 @@ router.post("/", async (req, res) => {
         let entrada = 0
         let saida = 0
 
-        let dataI = dataIString.split('-')
-        dataI = new Date(dataI[0], dataI[1] -1, dataI[2])
-        let dataF = dataFString.split('-')
-        dataF = new Date(dataF[0], dataF[1] -1, dataF[2])
+        const dataI = new Date(`${dataIString}T00:00:00.000Z`)
+        const dataF = new Date(`${dataFString}T23:59:59.999Z`)
         
         servicos.filter((servico) => {
-            const [dia, mes, ano] = servico.data.split('/');
-            const dataServico = new Date(ano, mes - 1, dia);
+            const dataServico = toISODateString(servico.data);
 
-            if (dataServico >= dataI && dataServico <= dataF) {
+            if (dataServico >= dataIString && dataServico <= dataFString) {
                 entrada = entrada + servico.preco
             }
         });
