@@ -68,6 +68,84 @@ h4 {
     margin-bottom: 20px;
 }
 
+.agenda-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.agenda-card {
+    width: 100%;
+    margin: 0;
+    padding: 12px;
+    background-color: #fffefe;
+    border: 1px solid #f8bbd0;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.agenda-card-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    text-align: left;
+}
+
+.agenda-name-wrap {
+    position: relative;
+    min-width: 0;
+}
+
+.agenda-name {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    outline: none;
+}
+
+.agenda-name-tooltip {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 6px);
+    z-index: 20;
+    min-width: 180px;
+    max-width: min(90vw, 320px);
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #f8bbd0;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    font-size: 0.92rem;
+    line-height: 1.3;
+    white-space: normal;
+    word-break: break-word;
+    display: none;
+}
+
+.agenda-name:hover + .agenda-name-tooltip,
+.agenda-name:focus + .agenda-name-tooltip,
+.agenda-name.is-open + .agenda-name-tooltip {
+    display: block;
+}
+
+.agenda-date,
+.agenda-time {
+    font-size: 0.96rem;
+}
+
+.agenda-empty,
+.agenda-loading {
+    margin: 10px 0 0;
+    color: #7a5f69;
+    font-size: 0.92rem;
+}
+
+#agendaScrollSentinel {
+    width: 100%;
+    height: 1px;
+}
+
 #detalhes {
     list-style: none; /* Remove os marcadores de lista */
     padding: 0;
@@ -648,7 +726,7 @@ body::before {
     .carousel-nav button {
         font-size: 1.5em;
     }
-    .linha-cards {
+    .linha-cards:not(.agenda-list) {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
@@ -661,7 +739,27 @@ body::before {
         width: 120px;
         height: 80px;
     }
-    .linha-cards {
+    .linha-cards:not(.agenda-list) {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 430px) {
+    .agenda-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 860px) {
+    .agenda-list {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .agenda-list {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 16px;
     }
 }

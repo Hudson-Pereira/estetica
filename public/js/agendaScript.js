@@ -1,5 +1,6 @@
 const mesAno = document.getElementById('mes-ano');
-const dias = document.getElementById('dias').getElementsByTagName('tbody')[0];
+const diasTabela = document.getElementById('dias');
+const dias = diasTabela ? diasTabela.getElementsByTagName('tbody')[0] : null;
 const anterior = document.getElementById('anterior');
 const proximo = document.getElementById('proximo');
 const calendario = document.getElementById('calendario');
@@ -13,6 +14,8 @@ let mesAtual = dataAtual.getMonth();
 let anoAtual = dataAtual.getFullYear();
 
 function mostrarCalendario(mes, ano) {
+  if (!mesAno || !dias) return;
+
   const primeiroDia = new Date(ano, mes).getDay();
   const diasNoMes = 32 - new Date(ano, mes, 32).getDate();
   const diasNoMesAnterior = 32 - new Date(ano, mes - 1, 32).getDate();
@@ -44,25 +47,27 @@ function mostrarCalendario(mes, ano) {
   }
 }
 
-mostrarCalendario(mesAtual, anoAtual);
-
-anterior.addEventListener('click', () => {
-  mesAtual--;
-  if (mesAtual < 0) {
-    mesAtual = 11;
-    anoAtual--;
-  }
+if (mesAno && dias && anterior && proximo) {
   mostrarCalendario(mesAtual, anoAtual);
-});
 
-proximo.addEventListener('click', () => {
-  mesAtual++;
-  if (mesAtual > 11) {
-    mesAtual = 0;
-    anoAtual++;
-  }
-  mostrarCalendario(mesAtual, anoAtual);
-});
+  anterior.addEventListener('click', () => {
+    mesAtual--;
+    if (mesAtual < 0) {
+      mesAtual = 11;
+      anoAtual--;
+    }
+    mostrarCalendario(mesAtual, anoAtual);
+  });
+
+  proximo.addEventListener('click', () => {
+    mesAtual++;
+    if (mesAtual > 11) {
+      mesAtual = 0;
+      anoAtual++;
+    }
+    mostrarCalendario(mesAtual, anoAtual);
+  });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const selectHora = document.getElementById('hora');
@@ -107,23 +112,27 @@ document.addEventListener('DOMContentLoaded', () => {
     
 // });
 
-calendario.addEventListener('click', (evento) => {
-    if (
-        evento.target.tagName === 'TD' &&
-        evento.target.textContent !== '' &&
-        !evento.target.classList.contains('mes-anterior') &&
-        !evento.target.classList.contains('mes-posterior') &&
-        !evento.target.classList.contains('dia-fechado')
-    ) {
-        sobreposicao.style.display = 'flex';
-        const diaClicado = evento.target.textContent.padStart(2, '0');
-        const dataFormatada = `${anoAtual}-${String(mesAtual + 1).padStart(2, '0')}-${diaClicado}`;
-        if (dataAgendamento) {
-            dataAgendamento.value = dataFormatada;
+if (calendario && sobreposicao) {
+  calendario.addEventListener('click', (evento) => {
+      if (
+          evento.target.tagName === 'TD' &&
+          evento.target.textContent !== '' &&
+          !evento.target.classList.contains('mes-anterior') &&
+          !evento.target.classList.contains('mes-posterior') &&
+          !evento.target.classList.contains('dia-fechado')
+      ) {
+          sobreposicao.style.display = 'flex';
+          const diaClicado = evento.target.textContent.padStart(2, '0');
+          const dataFormatada = `${anoAtual}-${String(mesAtual + 1).padStart(2, '0')}-${diaClicado}`;
+          if (dataAgendamento) {
+              dataAgendamento.value = dataFormatada;
+          }
         }
-    }
-});
+  });
+}
 
-fecharSobreposicao.addEventListener('click', () => {
-    sobreposicao.style.display = 'none';
-});
+if (fecharSobreposicao && sobreposicao) {
+  fecharSobreposicao.addEventListener('click', () => {
+      sobreposicao.style.display = 'none';
+  });
+}
