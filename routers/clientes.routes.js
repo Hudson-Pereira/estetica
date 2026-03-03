@@ -7,7 +7,8 @@ const prisma = new PrismaClient()
 const {
     isValidISODateString,
     isoDateStringToUtcDate,
-    formatAgendaForView
+    formatAgendaForView,
+    getTomorrowISODateString
 } = require('../utils/date');
 
 function filtrarAgendaMesAtual(agenda) {
@@ -54,7 +55,7 @@ router.get('/agenda', async (req, res) => {
 
 router.get('/agenda/add', async (req, res) => {
     try {
-        res.status(200).render('clientes/addAgenda', {message:``})
+        res.status(200).render('clientes/addAgenda', {message:``, minDate: getTomorrowISODateString()})
     } catch (err) {
         console.error(`Rota /cliente/agenda/add: ${err.message}`);
       throw new Error("Erro!!!!");
@@ -65,12 +66,20 @@ router.post('/agenda/add', async (req, res) => {
     try {
         
         let { nome, data, hora, preco, procedimento } = req.body
+        const minDate = getTomorrowISODateString();
 
         if(!nome || !data || !hora)
-            return res.status(200).render('clientes/addAgenda', {message: `Campos vazios!!`});
+            return res.status(200).render('clientes/addAgenda', {message: `Campos vazios!!`, minDate});
         
         if (!isValidISODateString(data)) {
-            return res.status(200).render('clientes/addAgenda', {message: `Data invalida!!`});
+            return res.status(200).render('clientes/addAgenda', {message: `Data invalida!!`, minDate});
+        }
+
+        if (data < minDate) {
+            return res.status(200).render('clientes/addAgenda', {
+                message: `Agendamento disponivel somente a partir de amanha.`,
+                minDate
+            });
         }
 
         const dataDate = isoDateStringToUtcDate(data);
@@ -78,7 +87,7 @@ router.post('/agenda/add', async (req, res) => {
         const verifyIfExists = await prisma.agenda.findMany({where: {data: dataDate, hora: hora}})
 
         if (verifyIfExists.length !== 0){
-            return res.status(200).render('clientes/addAgenda', {message: `Horario nao disponivel!!`});
+            return res.status(200).render('clientes/addAgenda', {message: `Horario nao disponivel!!`, minDate});
         }
 
         if (!preco) preco = 0;

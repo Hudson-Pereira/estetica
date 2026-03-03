@@ -13,6 +13,20 @@ let dataAtual = new Date();
 let mesAtual = dataAtual.getMonth();
 let anoAtual = dataAtual.getFullYear();
 
+function toLocalISODate(date) {
+  const ano = date.getFullYear();
+  const mes = String(date.getMonth() + 1).padStart(2, '0');
+  const dia = String(date.getDate()).padStart(2, '0');
+  return `${ano}-${mes}-${dia}`;
+}
+
+const dataMinAgendamento = (() => {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  d.setHours(0, 0, 0, 0);
+  return toLocalISODate(d);
+})();
+
 function mostrarCalendario(mes, ano) {
   if (!mesAno || !dias) return;
 
@@ -35,7 +49,10 @@ function mostrarCalendario(mes, ano) {
       data++;
     } else {
       const diaSemana = new Date(ano, mes, data).getDay();
-      const classeDiaFechado = diasFuncionamento.includes(diaSemana) ? '' : 'dia-fechado';
+      const dataCelula = `${ano}-${String(mes + 1).padStart(2, '0')}-${String(data).padStart(2, '0')}`;
+      const indisponivelPorDia = !diasFuncionamento.includes(diaSemana);
+      const indisponivelPorData = dataCelula < dataMinAgendamento;
+      const classeDiaFechado = (indisponivelPorDia || indisponivelPorData) ? 'dia-fechado' : '';
       linha.innerHTML += `<td class="${classeDiaFechado}">${data}</td>`;
       data++;
     }
@@ -71,6 +88,10 @@ if (mesAno && dias && anterior && proximo) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const selectHora = document.getElementById('hora');
+    if (dataAgendamento) {
+        dataAgendamento.min = dataMinAgendamento;
+    }
+
     if (selectHora) {
         const horaMin = 8;
         const horaMax = 18;

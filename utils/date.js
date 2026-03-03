@@ -19,9 +19,14 @@ function formatAgendaForView(agenda) {
   }));
 }
 
+function getTomorrowISODateString() {
+  return moment().add(1, "day").startOf("day").format("YYYY-MM-DD");
+}
+
 module.exports = {
   isValidISODateString,
   isoDateStringToUtcDate,
   toISODateString,
   formatAgendaForView,
+  getTomorrowISODateString,
 };
