@@ -9,7 +9,9 @@
     "start": "node index.js --watch",
     "start:dev": "nodemon index.js",
     "deploy": "vercel deploy --prod",
-    "seed": "prisma db seed"
+    "seed": "prisma db seed",
+    "prisma:generate": "prisma generate",
+    "db:migrate:agenda-date": "node prisma/migrate-agenda-data-to-datetime.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

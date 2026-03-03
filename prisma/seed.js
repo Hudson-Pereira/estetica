@@ -34,6 +34,10 @@ function formatarDataISO(data) {
   return `${ano}-${mes}-${dia}`;
 }
 
+function isoDateToUTCDate(isoDate) {
+  return new Date(`${isoDate}T00:00:00.000Z`);
+}
+
 function buildAgendaSeed() {
   const nomes = [
     "Ana Paula",
@@ -76,7 +80,7 @@ function buildAgendaSeed() {
 
       agenda.push({
         nome,
-        data,
+        data: isoDateToUTCDate(data),
         hora,
         preco: proc.preco,
         procedimento: proc.nome,
@@ -97,7 +101,7 @@ async function main() {
 
   // Produtos e Servicos deixados comentados para uso futuro.
   // const produtosSeed = [
-  //   { nome: "Produto Exemplo", valor: 10, descricao: "Desc", data: "01/01/2026", estoque: 10, vendedor: "Equipe" },
+  //   { nome: "Produto Exemplo", valor: 10, descricao: "Desc", data: "2026-01-01", estoque: 10, vendedor: "Equipe" },
   // ];
   //
   // const servicosSeed = [
