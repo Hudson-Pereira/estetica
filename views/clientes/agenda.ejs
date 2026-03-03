@@ -18,39 +18,29 @@
                         alt="Buscar" /></button>
                 </form>
         </section>
-<!-- <main class="agenda">
-    <h1>Agendamentos</h1>
-
-    <% agenda.forEach(item=> { %>
-    <section id="dados">
-        <div id="detalhes">
-            <div id="dadosAgenda">
-                <div><%= item.nome %></div>
-                <div><%= item.data %></div>
-                <div><%= item.hora %></div>
-            </div>
-        </div>
-    </section>
-    <% }); %>
-
-</main> -->
 <main class="agenda">
     <h1>Agendamentos</h1>
-    <% for (let i = 0; i < agenda.length; i += 5) { %>
-        <div class="linha-cards">
-            <% for (let j = i; j < i + 5 && j < agenda.length; j++) { %>
-                <section id="dados">
-                    <div id="detalhes">
-                        <div id="dadosAgenda">
-                            <div><%= agenda[j].nome %></div>
-                            <div><%= agenda[j].data %></div>
-                            <div><%= agenda[j].hora %></div>
-                        </div>
-                    </div>
-                </section>
-            <% } %>
-        </div>
-    <% } %>
+    <div class="linha-cards agenda-list" id="agendaList"></div>
+    <div id="agendaScrollSentinel" aria-hidden="true"></div>
+    <p id="agendaEmptyState" class="agenda-empty" hidden>Nenhum agendamento encontrado.</p>
+    <p id="agendaLoadingHint" class="agenda-loading" hidden>Carregando mais...</p>
+    <button id="scrollTopBtn" class="scroll-top-btn" type="button" aria-label="Voltar ao topo">↑</button>
+
+    <script id="agendaData" type="application/json"><%- JSON.stringify(agenda).replace(/</g, '\\u003c') %></script>
+
+    <template id="agendaCardTemplate">
+        <section class="agenda-card">
+            <div class="agenda-card-content">
+                <div class="agenda-name-wrap">
+                    <span class="agenda-name" tabindex="0"></span>
+                    <span class="agenda-name-tooltip" role="tooltip"></span>
+                </div>
+                <div class="agenda-date"></div>
+                <div class="agenda-time"></div>
+            </div>
+        </section>
+    </template>
+    <script src="/public/js/clientAgendaScript.js"></script>
 </main>
 
     <%- include('../includes/clientFooter'); %>

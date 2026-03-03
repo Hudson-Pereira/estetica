@@ -1,6 +1,6 @@
 {
   "name": "elisangela",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "",
   "main": "index.js",
   "type": "commonjs",
@@ -8,7 +8,13 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js --watch",
     "start:dev": "nodemon index.js",
-    "deploy": "vercel deploy --prod"
+    "deploy": "vercel deploy --prod",
+    "seed": "prisma db seed",
+    "prisma:generate": "prisma generate",
+    "db:migrate:agenda-date": "node prisma/migrate-agenda-data-to-datetime.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "author": "",
   "license": "ISC",

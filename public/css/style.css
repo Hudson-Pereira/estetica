@@ -50,9 +50,8 @@ h4 {
 }
 
 #dados {
-    display: inline-block; /* Exibe os cards lado a lado */
-    min-width: 15%; /* Largura dos cards (ajuste conforme necessário) */
-    margin: 20px 10px; /* Espaço entre os cards */
+    width: 100%;
+    margin: 0;
     padding: 15px;
     background-color: #fffefe; /* Cor de fundo dos dados */
     border: 1px solid #f8bbd0; /* Borda dos dados */
@@ -62,12 +61,127 @@ h4 {
 }
 
 .linha-cards{
-    display: flex; /* Exibe os cards em linha */
-    /* flex-wrap: wrap; Permite que os cards quebrem para a próxima linha */
-    justify-content: center; /* Centraliza os cards horizontalmente */
-    gap: 20px; /* Espaço entre os cards */
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 20px;
     margin-bottom: 20px;
-    flex-wrap: nowrap;
+}
+
+.agenda-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.agenda-card {
+    width: 100%;
+    margin: 0;
+    padding: 12px;
+    background-color: #fffefe;
+    border: 1px solid #f8bbd0;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.agenda-card-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    text-align: left;
+}
+
+.agenda-name-wrap {
+    position: relative;
+    min-width: 0;
+}
+
+.agenda-name {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    outline: none;
+}
+
+.agenda-name-tooltip {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 6px);
+    z-index: 20;
+    min-width: 180px;
+    max-width: min(90vw, 320px);
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #f8bbd0;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    font-size: 0.92rem;
+    line-height: 1.3;
+    white-space: normal;
+    word-break: break-word;
+    display: none;
+}
+
+.agenda-name:hover + .agenda-name-tooltip,
+.agenda-name:focus + .agenda-name-tooltip,
+.agenda-name.is-open + .agenda-name-tooltip {
+    display: block;
+}
+
+.agenda-date,
+.agenda-time {
+    font-size: 0.96rem;
+}
+
+.agenda-empty,
+.agenda-loading {
+    margin: 10px 0 0;
+    color: #7a5f69;
+    font-size: 0.92rem;
+}
+
+#agendaScrollSentinel {
+    width: 100%;
+    height: 1px;
+}
+
+.scroll-top-btn {
+    position: fixed;
+    right: 14px;
+    bottom: 82px;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(248, 187, 208, 0.9);
+    border-radius: 999px;
+    background: rgba(216, 112, 147, 0.72);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+    z-index: 1200;
+}
+
+.scroll-top-btn.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.scroll-top-btn:hover,
+.scroll-top-btn:focus-visible {
+    background: rgba(233, 30, 99, 0.78);
+    outline: none;
 }
 
 #detalhes {
@@ -453,6 +567,16 @@ body::before {
   }
 
 /* Sobreposição */
+  td.dia-fechado {
+    background-color: #f1f1f1;
+    color: #b1b1b1;
+    cursor: not-allowed;
+  }
+
+  td.dia-fechado:hover {
+    background-color: #f1f1f1;
+  }
+
   .sobreposicao {
     display: none;
     position: fixed;
@@ -640,8 +764,8 @@ body::before {
     .carousel-nav button {
         font-size: 1.5em;
     }
-    #dados{
-        width: 25%;
+    .linha-cards:not(.agenda-list) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
@@ -653,7 +777,27 @@ body::before {
         width: 120px;
         height: 80px;
     }
-    #dados{
-        width: 40%;
+    .linha-cards:not(.agenda-list) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 430px) {
+    .agenda-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 860px) {
+    .agenda-list {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .agenda-list {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 16px;
     }
 }

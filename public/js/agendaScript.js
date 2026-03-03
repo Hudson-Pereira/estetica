@@ -1,17 +1,35 @@
 const mesAno = document.getElementById('mes-ano');
-const dias = document.getElementById('dias').getElementsByTagName('tbody')[0];
+const diasTabela = document.getElementById('dias');
+const dias = diasTabela ? diasTabela.getElementsByTagName('tbody')[0] : null;
 const anterior = document.getElementById('anterior');
 const proximo = document.getElementById('proximo');
 const calendario = document.getElementById('calendario');
 const sobreposicao = document.getElementById('sobreposicao');
 const fecharSobreposicao = document.querySelector('.fechar-sobreposicao');
 const dataAgendamento = document.getElementById('data');
+const diasFuncionamento = [1, 2, 3, 4, 5]; // segunda a sexta
 
 let dataAtual = new Date();
 let mesAtual = dataAtual.getMonth();
 let anoAtual = dataAtual.getFullYear();
 
+function toLocalISODate(date) {
+  const ano = date.getFullYear();
+  const mes = String(date.getMonth() + 1).padStart(2, '0');
+  const dia = String(date.getDate()).padStart(2, '0');
+  return `${ano}-${mes}-${dia}`;
+}
+
+const dataMinAgendamento = (() => {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  d.setHours(0, 0, 0, 0);
+  return toLocalISODate(d);
+})();
+
 function mostrarCalendario(mes, ano) {
+  if (!mesAno || !dias) return;
+
   const primeiroDia = new Date(ano, mes).getDay();
   const diasNoMes = 32 - new Date(ano, mes, 32).getDate();
   const diasNoMesAnterior = 32 - new Date(ano, mes - 1, 32).getDate();
@@ -30,7 +48,12 @@ function mostrarCalendario(mes, ano) {
       linha.innerHTML += `<td class="mes-posterior">${diaPosterior}</td>`;
       data++;
     } else {
-      linha.innerHTML += `<td>${data}</td>`;
+      const diaSemana = new Date(ano, mes, data).getDay();
+      const dataCelula = `${ano}-${String(mes + 1).padStart(2, '0')}-${String(data).padStart(2, '0')}`;
+      const indisponivelPorDia = !diasFuncionamento.includes(diaSemana);
+      const indisponivelPorData = dataCelula < dataMinAgendamento;
+      const classeDiaFechado = (indisponivelPorDia || indisponivelPorData) ? 'dia-fechado' : '';
+      linha.innerHTML += `<td class="${classeDiaFechado}">${data}</td>`;
       data++;
     }
 
@@ -41,28 +64,34 @@ function mostrarCalendario(mes, ano) {
   }
 }
 
-mostrarCalendario(mesAtual, anoAtual);
-
-anterior.addEventListener('click', () => {
-  mesAtual--;
-  if (mesAtual < 0) {
-    mesAtual = 11;
-    anoAtual--;
-  }
+if (mesAno && dias && anterior && proximo) {
   mostrarCalendario(mesAtual, anoAtual);
-});
 
-proximo.addEventListener('click', () => {
-  mesAtual++;
-  if (mesAtual > 11) {
-    mesAtual = 0;
-    anoAtual++;
-  }
-  mostrarCalendario(mesAtual, anoAtual);
-});
+  anterior.addEventListener('click', () => {
+    mesAtual--;
+    if (mesAtual < 0) {
+      mesAtual = 11;
+      anoAtual--;
+    }
+    mostrarCalendario(mesAtual, anoAtual);
+  });
+
+  proximo.addEventListener('click', () => {
+    mesAtual++;
+    if (mesAtual > 11) {
+      mesAtual = 0;
+      anoAtual++;
+    }
+    mostrarCalendario(mesAtual, anoAtual);
+  });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const selectHora = document.getElementById('hora');
+    if (dataAgendamento) {
+        dataAgendamento.min = dataMinAgendamento;
+    }
+
     if (selectHora) {
         const horaMin = 8;
         const horaMax = 18;
@@ -104,22 +133,27 @@ document.addEventListener('DOMContentLoaded', () => {
     
 // });
 
-calendario.addEventListener('click', (evento) => {
-    if (
-        evento.target.tagName === 'TD' &&
-        evento.target.textContent !== '' &&
-        !evento.target.classList.contains('mes-anterior') &&
-        !evento.target.classList.contains('mes-posterior')
-    ) {
-        sobreposicao.style.display = 'flex';
-        const diaClicado = evento.target.textContent.padStart(2, '0');
-        const dataFormatada = `${anoAtual}-${String(mesAtual + 1).padStart(2, '0')}-${diaClicado}`;
-        if (dataAgendamento) {
-            dataAgendamento.value = dataFormatada;
+if (calendario && sobreposicao) {
+  calendario.addEventListener('click', (evento) => {
+      if (
+          evento.target.tagName === 'TD' &&
+          evento.target.textContent !== '' &&
+          !evento.target.classList.contains('mes-anterior') &&
+          !evento.target.classList.contains('mes-posterior') &&
+          !evento.target.classList.contains('dia-fechado')
+      ) {
+          sobreposicao.style.display = 'flex';
+          const diaClicado = evento.target.textContent.padStart(2, '0');
+          const dataFormatada = `${anoAtual}-${String(mesAtual + 1).padStart(2, '0')}-${diaClicado}`;
+          if (dataAgendamento) {
+              dataAgendamento.value = dataFormatada;
+          }
         }
-    }
-});
+  });
+}
 
-fecharSobreposicao.addEventListener('click', () => {
-    sobreposicao.style.display = 'none';
-});
+if (fecharSobreposicao && sobreposicao) {
+  fecharSobreposicao.addEventListener('click', () => {
+      sobreposicao.style.display = 'none';
+  });
+}

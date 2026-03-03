@@ -4,6 +4,7 @@ const passport = require('passport')
 
 const {PrismaClient} = require('@prisma/client');
 const prisma = new PrismaClient()
+const { isoDateStringToUtcDate, formatAgendaForView } = require('../utils/date');
 
 router.get("/", async (req, res) => {
     try {
@@ -14,9 +15,11 @@ router.get("/", async (req, res) => {
   
       hoje = `${ano}-${mes}-${dia}`;
       const hojeS = hoje.toString();
+      const hojeDate = isoDateStringToUtcDate(hojeS);
   
       let produtos = await prisma.produtos.findMany({});
-      let agendas = await prisma.agenda.findMany({ where: { data: hojeS } });
+      let agendas = await prisma.agenda.findMany({ where: { data: hojeDate }, orderBy: [{hora: 'asc'}] });
+      agendas = formatAgendaForView(agendas);
   
       produtos = produtos.filter((produto) => {
         if (produto.data > hoje) {

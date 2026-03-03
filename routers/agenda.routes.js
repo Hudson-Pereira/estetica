@@ -1,16 +1,23 @@
 const express = require('express');
 const router = express.Router();
-const moment = require('moment');
 
 
 const {PrismaClient} = require('@prisma/client');
 const prisma = new PrismaClient()
+const {
+    isValidISODateString,
+    isoDateStringToUtcDate,
+    formatAgendaForView,
+    toISODateString
+} = require('../utils/date');
 
 router.get("/", async (req, res) => {
     try { 
-        const agenda = await prisma.agenda.findMany({})
+        const agenda = await prisma.agenda.findMany({
+            orderBy: [{data: 'asc'}, {hora: 'asc'}]
+        })
         res.status(200).render('agenda', {
-            agenda: agenda,
+            agenda: formatAgendaForView(agenda),
             message:``
         })
     } catch (err) {
@@ -43,9 +50,13 @@ router.post("/add", async (req, res) => {
         if(!nome || !data || !hora)
             return res.status(200).render('agenda', {message: `Campos vazios!!`});
 
-        data = moment(data).locale('pt-br').format('DD/MM/YYYY');
+        if (!isValidISODateString(data)) {
+            return res.status(200).render('agenda', {message: `Data invalida!!`});
+        }
 
-        const verifyIfExists = await prisma.agenda.findMany({where: {data: data, hora: hora}})
+        const dataDate = isoDateStringToUtcDate(data);
+
+        const verifyIfExists = await prisma.agenda.findMany({where: {data: dataDate, hora: hora}})
 
         if (verifyIfExists.length !== 0){
             return res.status(200).render('addAgenda', {message: `Horario nao disponivel!!`});
@@ -56,7 +67,7 @@ router.post("/add", async (req, res) => {
         
         await prisma.agenda.create({
             data: {
-                nome, data, hora, preco, procedimento
+                nome, data: dataDate, hora, preco, procedimento
             },
         })
         res.status(200).render('agenda', {message: `Agendamento concluido!!`})
@@ -70,7 +81,15 @@ router.get('/alterar/:id', async (req, res) => {
     try {
         const { id } = req.params
         const agenda = await prisma.agenda.findUnique({ where: { id } })
-        res.status(200).render('alterarAgenda', { agenda: agenda, message: `` })
+        if (!agenda) {
+            return res.status(200).redirect('/agenda')
+        }
+
+        const agendaFormatada = {
+            ...agenda,
+            data: toISODateString(agenda.data)
+        }
+        res.status(200).render('alterarAgenda', { agenda: agendaFormatada, message: `` })
     } catch (err) {
         console.error(`Rota /agenda/alterar: ${err.message}`)
         throw new Error("Erro!!!!")
@@ -80,12 +99,15 @@ router.get('/alterar/:id', async (req, res) => {
 router.post("/alterar/:id", async (req, res) => {
     try {
         const { id } = req.params
+        if (!isValidISODateString(req.body.data)) {
+            return res.status(200).redirect('/agenda')
+        }
         
         await prisma.agenda.update({
             where: { id },
             data: {
                 nome: req.body.nome,
-                data: moment(req.body.data).locale('pt-br').format('DD/MM/YYYY'),
+                data: isoDateStringToUtcDate(req.body.data),
                 hora: req.body.hora,
                 preco: parseFloat(req.body.preco)
             }
@@ -119,16 +141,22 @@ router.post('/search', async (req, res) => {
         let {search} = req.body
 
         if(!search){
-            const agenda = await prisma.agenda.findMany()
+            const agenda = await prisma.agenda.findMany({
+                orderBy: [{data: 'asc'}, {hora: 'asc'}]
+            })
 
-            return res.status(200).render('agenda', {agenda: agenda, message:``})
+            return res.status(200).render('agenda', {agenda: formatAgendaForView(agenda), message:``})
         }
 
-        let date = moment(search).locale('pt-br').format('DD/MM/YYYY');
+        if (!isValidISODateString(search)) {
+            return res.status(200).render('agenda', {agenda: [], message:`Data invalida!!`})
+        }
 
-        const agenda = await prisma.agenda.findMany({where:{data: date}})
+        let date = isoDateStringToUtcDate(search);
+
+        const agenda = await prisma.agenda.findMany({where:{data: date}, orderBy:[{data: 'asc'}, {hora: 'asc'}]})
         
-        res.status(200).render('agenda', {agenda: agenda, message: ``})
+        res.status(200).render('agenda', {agenda: formatAgendaForView(agenda), message: ``})
     } catch (err) {
         console.error(`Rota post /search ${err.message}`)
         res.status(200).render('agenda', {message:``})

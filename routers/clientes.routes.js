@@ -4,6 +4,22 @@ const moment = require('moment');
 
 const {PrismaClient} = require('@prisma/client');
 const prisma = new PrismaClient()
+const {
+    isValidISODateString,
+    isoDateStringToUtcDate,
+    formatAgendaForView,
+    getTomorrowISODateString
+} = require('../utils/date');
+
+function filtrarAgendaMesAtual(agenda) {
+    const inicioMesAtual = moment.utc().startOf('month');
+    const fimMesAtual = moment.utc().endOf('month');
+
+    return agenda.filter((item) => {
+        const dataItem = moment.utc(item.data);
+        return dataItem.isValid() && dataItem.isBetween(inicioMesAtual, fimMesAtual, 'day', '[]');
+    });
+}
 
 router.get('/', async (req, res) => {
     try { 
@@ -17,13 +33,6 @@ router.get('/', async (req, res) => {
 
 router.get('/agenda', async (req, res) => {
     try { 
-        
-        let hoje = new Date();   
-        hoje = moment(hoje).locale('pt-br').format('DD/MM/YYYY');
-        let dia = hoje.slice(0,2)
-        let mes = hoje.slice(3,5)
-        let ano = hoje.slice(6)
-
         let agenda = await prisma.agenda.findMany({
             orderBy:[
                 {data: 'asc'}, 
@@ -31,21 +40,11 @@ router.get('/agenda', async (req, res) => {
                 ]
             }) 
 
-            const agendaFiltrada = agenda.filter(item => {
-                let itemAno = item.data.slice(6)
-                if(itemAno == ano){
-                    let itemMes = item.data.slice(3,5)
-                    if(itemMes >= mes){
-                        let itemDia = item.data.slice(0,2)
-                        if(itemDia >= dia)
-                            return item
-                    }
-                }
-            });
+            const agendaFiltrada = filtrarAgendaMesAtual(agenda);
 
         
         res.status(200).render('clientes/agenda', {
-            agenda: agendaFiltrada,
+            agenda: formatAgendaForView(agendaFiltrada),
             message:``
         })
     } catch (err) {
@@ -56,7 +55,7 @@ router.get('/agenda', async (req, res) => {
 
 router.get('/agenda/add', async (req, res) => {
     try {
-        res.status(200).render('clientes/addAgenda', {message:``})
+        res.status(200).render('clientes/addAgenda', {message:``, minDate: getTomorrowISODateString()})
     } catch (err) {
         console.error(`Rota /cliente/agenda/add: ${err.message}`);
       throw new Error("Erro!!!!");
@@ -67,16 +66,28 @@ router.post('/agenda/add', async (req, res) => {
     try {
         
         let { nome, data, hora, preco, procedimento } = req.body
+        const minDate = getTomorrowISODateString();
 
         if(!nome || !data || !hora)
-            return res.status(200).render('clientes/addAgenda', {message: `Campos vazios!!`});
+            return res.status(200).render('clientes/addAgenda', {message: `Campos vazios!!`, minDate});
         
-        data = moment(data).locale('pt-br').format('DD/MM/YYYY');
+        if (!isValidISODateString(data)) {
+            return res.status(200).render('clientes/addAgenda', {message: `Data invalida!!`, minDate});
+        }
 
-        const verifyIfExists = await prisma.agenda.findMany({where: {data: data, hora: hora}})
+        if (data < minDate) {
+            return res.status(200).render('clientes/addAgenda', {
+                message: `Agendamento disponivel somente a partir de amanha.`,
+                minDate
+            });
+        }
+
+        const dataDate = isoDateStringToUtcDate(data);
+
+        const verifyIfExists = await prisma.agenda.findMany({where: {data: dataDate, hora: hora}})
 
         if (verifyIfExists.length !== 0){
-            return res.status(200).render('clientes/addAgenda', {message: `Horario nao disponivel!!`});
+            return res.status(200).render('clientes/addAgenda', {message: `Horario nao disponivel!!`, minDate});
         }
 
         if (!preco) preco = 0;
@@ -84,15 +95,9 @@ router.post('/agenda/add', async (req, res) => {
         
         await prisma.agenda.create({
             data: {
-                nome, data, hora, preco, procedimento
+                nome, data: dataDate, hora, preco, procedimento
             },
         })
-
-        let hoje = new Date();   
-        hoje = moment(hoje).locale('pt-br').format('DD/MM/YYYY');
-        let dia = hoje.slice(0,2)
-        let mes = hoje.slice(3,5)
-        let ano = hoje.slice(6)
 
         let agenda = await prisma.agenda.findMany({
             orderBy:[
@@ -101,19 +106,9 @@ router.post('/agenda/add', async (req, res) => {
                 ]
             }) 
 
-            const agendaFiltrada = agenda.filter(item => {
-                let itemAno = item.data.slice(6)
-                if(itemAno == ano){
-                    let itemMes = item.data.slice(3,5)
-                    if(itemMes >= mes){
-                        let itemDia = item.data.slice(0,2)
-                        if(itemDia >= dia)
-                            return item
-                    }
-                }
-            });
+            const agendaFiltrada = filtrarAgendaMesAtual(agenda);
 
-        res.status(200).render('clientes/agenda', {agenda: agendaFiltrada, message: `Agendamento concluido!!`})
+        res.status(200).render('clientes/agenda', {agenda: formatAgendaForView(agendaFiltrada), message: `Agendamento concluido!!`})
     } catch (err) {
         console.error(`Rota /cliente/add: ${err.message}`);
       throw new Error("Erro!!!!");
@@ -138,12 +133,6 @@ router.post('/search', async (req, res) => {
     try {
         let {search} = req.body
 
-        let hoje = new Date();   
-        hoje = moment(hoje).locale('pt-br').format('DD/MM/YYYY');
-        let dia = hoje.slice(0,2)
-        let mes = hoje.slice(3,5)
-        let ano = hoje.slice(6)
-
         if(!search){
         
         let agenda = await prisma.agenda.findMany({
@@ -153,26 +142,20 @@ router.post('/search', async (req, res) => {
                 ]
             }) 
 
-            const agendaFiltrada = agenda.filter(item => {
-                let itemAno = item.data.slice(6)
-                if(itemAno == ano){
-                    let itemMes = item.data.slice(3,5)
-                    if(itemMes >= mes){
-                        let itemDia = item.data.slice(0,2)
-                        if(itemDia >= dia)
-                            return item
-                    }
-                }
-            });
+            const agendaFiltrada = filtrarAgendaMesAtual(agenda);
 
-            return res.status(200).render('clientes/agenda', {agenda: agendaFiltrada, message:``})
+            return res.status(200).render('clientes/agenda', {agenda: formatAgendaForView(agendaFiltrada), message:``})
         }
 
-        search = moment(search).locale('pt-br').format('DD/MM/YYYY');
+        if (!isValidISODateString(search)) {
+            return res.status(200).render('clientes/agenda', {agenda: [], message:`Data invalida!!`});
+        }
 
-        const agenda = await prisma.agenda.findMany({where:{data: search}, orderBy:[{data: 'asc'}, {hora: 'asc'}]})
+        const searchDate = isoDateStringToUtcDate(search);
+
+        const agenda = await prisma.agenda.findMany({where:{data: searchDate}, orderBy:[{data: 'asc'}, {hora: 'asc'}]})
         
-        res.status(200).render('clientes/agenda', {agenda: agenda, message: ``})
+        res.status(200).render('clientes/agenda', {agenda: formatAgendaForView(agenda), message: ``})
     } catch (err) {
         console.error(`Rota post /search ${err.message}`)
         res.status(200).render('clientes/agenda', {message:``})
