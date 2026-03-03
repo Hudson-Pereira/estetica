@@ -146,6 +146,44 @@ h4 {
     height: 1px;
 }
 
+.scroll-top-btn {
+    position: fixed;
+    right: 14px;
+    bottom: 82px;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(248, 187, 208, 0.9);
+    border-radius: 999px;
+    background: rgba(216, 112, 147, 0.72);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+    z-index: 1200;
+}
+
+.scroll-top-btn.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.scroll-top-btn:hover,
+.scroll-top-btn:focus-visible {
+    background: rgba(233, 30, 99, 0.78);
+    outline: none;
+}
+
 #detalhes {
     list-style: none; /* Remove os marcadores de lista */
     padding: 0;

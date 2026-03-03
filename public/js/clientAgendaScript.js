@@ -3,6 +3,7 @@
   const sentinelEl = document.getElementById("agendaScrollSentinel");
   const loadingHintEl = document.getElementById("agendaLoadingHint");
   const emptyStateEl = document.getElementById("agendaEmptyState");
+  const scrollTopBtn = document.getElementById("scrollTopBtn");
   const dataEl = document.getElementById("agendaData");
   const templateEl = document.getElementById("agendaCardTemplate");
 
@@ -18,6 +19,16 @@
   const CHUNK_SIZE = 12;
   let nextIndex = 0;
   let isLoading = false;
+
+  function pageCanScroll() {
+    return document.documentElement.scrollHeight > window.innerHeight + 8;
+  }
+
+  function toggleScrollTopButton() {
+    if (!scrollTopBtn) return;
+    const shouldShow = pageCanScroll() && window.scrollY > 80;
+    scrollTopBtn.classList.toggle("is-visible", shouldShow);
+  }
 
   function toPtBrDate(value) {
     if (typeof value !== "string") return "";
@@ -83,6 +94,8 @@
       observer.disconnect();
       sentinelEl.hidden = true;
     }
+
+    toggleScrollTopButton();
   }
 
   emptyStateEl.hidden = agenda.length !== 0;
@@ -106,4 +119,12 @@
 
   renderChunk();
   observer.observe(sentinelEl);
+
+  if (scrollTopBtn) {
+    window.addEventListener("scroll", toggleScrollTopButton, { passive: true });
+    window.addEventListener("resize", toggleScrollTopButton);
+    scrollTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
 })();
