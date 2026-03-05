@@ -11,13 +11,13 @@ const {
     getTomorrowISODateString
 } = require('../utils/date');
 
-function filtrarAgendaMesAtual(agenda) {
-    const inicioMesAtual = moment.utc().startOf('month');
-    const fimMesAtual = moment.utc().endOf('month');
+function filtrarAgendaProximaSemana(agenda) {
+    const inicioHoje = moment.utc().startOf('day');
+    const fimSemana = moment.utc().add(7, 'days').endOf('day');
 
     return agenda.filter((item) => {
         const dataItem = moment.utc(item.data);
-        return dataItem.isValid() && dataItem.isBetween(inicioMesAtual, fimMesAtual, 'day', '[]');
+        return dataItem.isValid() && dataItem.isBetween(inicioHoje, fimSemana, 'day', '[]');
     });
 }
 
@@ -40,7 +40,7 @@ router.get('/agenda', async (req, res) => {
                 ]
             }) 
 
-            const agendaFiltrada = filtrarAgendaMesAtual(agenda);
+            const agendaFiltrada = filtrarAgendaProximaSemana(agenda);
 
         
         res.status(200).render('clientes/agenda', {
@@ -106,7 +106,7 @@ router.post('/agenda/add', async (req, res) => {
                 ]
             }) 
 
-            const agendaFiltrada = filtrarAgendaMesAtual(agenda);
+            const agendaFiltrada = filtrarAgendaProximaSemana(agenda);
 
         res.status(200).render('clientes/agenda', {agenda: formatAgendaForView(agendaFiltrada), message: `Agendamento concluido!!`})
     } catch (err) {
@@ -142,7 +142,7 @@ router.post('/search', async (req, res) => {
                 ]
             }) 
 
-            const agendaFiltrada = filtrarAgendaMesAtual(agenda);
+            const agendaFiltrada = filtrarAgendaProximaSemana(agenda);
 
             return res.status(200).render('clientes/agenda', {agenda: formatAgendaForView(agendaFiltrada), message:``})
         }
