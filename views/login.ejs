@@ -15,6 +15,7 @@
       <h1><%= title %></h1>
       <section id="login">
         <form action="/login" method="POST">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <input name="username" id="username" type="text" placeholder="Nome"/><br />
           <input name="password" id="password" type="password" placeholder="Senha"/><br />
           <button class="submit">Login</button>

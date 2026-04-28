@@ -13,6 +13,7 @@
     <%- include('../includes/clientHeader'); %>
         <section id="divBusca">
             <form action="/cliente/search" method="POST">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <input type="date" id="txtBusca" name="search" placeholder="Buscar..." />
                 <button type="submit" id="search"><img src="/public/images/icons8-pesquisar-sf-black-16.png" id="btnBusca"
                         alt="Buscar" /></button>

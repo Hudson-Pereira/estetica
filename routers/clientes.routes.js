@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const moment = require('moment');
-
-const {PrismaClient} = require('@prisma/client');
-const prisma = new PrismaClient()
+const prisma = require('../utils/prismaClient');
 const {
     isValidISODateString,
     isoDateStringToUtcDate,

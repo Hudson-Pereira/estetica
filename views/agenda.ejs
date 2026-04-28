@@ -11,7 +11,8 @@
 <body>
     <%- include('./includes/adminHeader'); %>
     <section id="divBusca">
-        <form action="/cliente/search" method="POST">
+        <form action="/agenda/search" method="POST">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <input type="date" id="txtBusca" name="search" placeholder="Buscar..." />
             <button type="submit" id="search"><img src="../../public/images/icons8-pesquisar-sf-black-16.png" id="btnBusca"
                     alt="Buscar" /></button>
@@ -34,7 +35,10 @@
                     </section>
                     <section id="manipulacao">
                         <a href="agenda/alterar/<%= item.id%>"><button class="manipular">Alterar</button></a>
-                        <a href="agenda/deletar/<%= item.id%>"><button class="manipular">Deletar</button></a>
+                        <form method="POST" action="agenda/deletar/<%= item.id%>" style="display: inline;">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button type="submit" class="manipular" onclick="return confirm('Tem certeza que deseja deletar este agendamento?')">Deletar</button>
+                        </form>
                     </section>
                 </ul>
                 

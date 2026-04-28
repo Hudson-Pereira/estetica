@@ -26,7 +26,10 @@
                 </section>
                 <section id = "mani">
                     <a href="servicos/alterar/<%= item.id%>"><button>Alterar</button></a>
-                    <a href="servicos/deletar/<%= item.id%>"><button>Deletar</button></a>
+                    <form method="POST" action="servicos/deletar/<%= item.id%>" style="display: inline;">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <button type="submit" onclick="return confirm('Tem certeza que deseja deletar este serviço?')">Deletar</button>
+                    </form>
                 </section>
                 
             </ul>

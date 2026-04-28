@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
-
-
-const {PrismaClient} = require('@prisma/client');
-const prisma = new PrismaClient()
+const prisma = require('../utils/prismaClient');
+const { validations, handleValidationErrors } = require('../utils/validators');
 const {
     isValidISODateString,
     isoDateStringToUtcDate,
@@ -18,40 +16,36 @@ router.get("/", async (req, res) => {
         })
         res.status(200).render('agenda', {
             agenda: formatAgendaForView(agenda),
-            message:``
+            message:``,
+            csrfToken: req.csrfToken()
         })
     } catch (err) {
-        console.error(`Rota /agenda ${err.message}`)
+        console.error(`Rota /agenda: ${err.message}`)
+        res.status(500).render('error', { message: 'Erro ao carregar agenda' })
     }
 })
 
 router.get("/add", async (req, res) => {
     try {
-        res.status(200).render('addAgenda', {message: ``})
+        res.status(200).render('addAgenda', { 
+            message: ``,
+            csrfToken: req.csrfToken()
+        })
     } catch (err) {
         console.error(`Rota /agenda/add: ${err.message}`)
-        throw new Error("Erro!!!!")
+        res.status(500).render('error', { message: 'Erro ao abrir formulário' })
     }
 })
 
-// router.get("/agenda/add", async (req, res) => {
-//     try {
-//         res.status(200).render('addAgenda')
-//     } catch (err) {
-//         console.error(`Rota /agenda/add: ${err.message}`)
-//         throw new Error("Erro!!!!")
-//     }
-// })
-
-router.post("/add", async (req, res) => {
+router.post("/add", validations.agenda.create, handleValidationErrors, async (req, res) => {
     try {
         let { nome, data, hora, preco, procedimento } = req.body
 
-        if(!nome || !data || !hora)
-            return res.status(200).render('agenda', {message: `Campos vazios!!`});
-
         if (!isValidISODateString(data)) {
-            return res.status(200).render('agenda', {message: `Data invalida!!`});
+            return res.status(400).render('addAgenda', { 
+                message: `Data inválida!`,
+                csrfToken: req.csrfToken()
+            });
         }
 
         const dataDate = isoDateStringToUtcDate(data);
@@ -59,7 +53,10 @@ router.post("/add", async (req, res) => {
         const verifyIfExists = await prisma.agenda.findMany({where: {data: dataDate, hora: hora}})
 
         if (verifyIfExists.length !== 0){
-            return res.status(200).render('addAgenda', {message: `Horario nao disponivel!!`});
+            return res.status(400).render('addAgenda', { 
+                message: `Horário não disponível!`,
+                csrfToken: req.csrfToken()
+            });
         }
 
         if (!preco) preco = 0;
@@ -70,10 +67,13 @@ router.post("/add", async (req, res) => {
                 nome, data: dataDate, hora, preco, procedimento
             },
         })
-        res.status(200).render('agenda', {message: `Agendamento concluido!!`})
+        res.status(302).redirect('/agenda')
     } catch(err) {
         console.error(`Rota post /agenda/add: ${err.message}`)
-        res.status(200).redirect('agenda')
+        res.status(400).render('addAgenda', { 
+            message: 'Erro ao agendar',
+            csrfToken: req.csrfToken()
+        })
     }
 })
 
@@ -82,25 +82,32 @@ router.get('/alterar/:id', async (req, res) => {
         const { id } = req.params
         const agenda = await prisma.agenda.findUnique({ where: { id } })
         if (!agenda) {
-            return res.status(200).redirect('/agenda')
+            return res.status(404).render('error', { message: 'Agendamento não encontrado' })
         }
 
         const agendaFormatada = {
             ...agenda,
             data: toISODateString(agenda.data)
         }
-        res.status(200).render('alterarAgenda', { agenda: agendaFormatada, message: `` })
+        res.status(200).render('alterarAgenda', { 
+            agenda: agendaFormatada, 
+            message: ``,
+            csrfToken: req.csrfToken()
+        })
     } catch (err) {
         console.error(`Rota /agenda/alterar: ${err.message}`)
-        throw new Error("Erro!!!!")
+        res.status(500).render('error', { message: 'Erro ao carregar agendamento' })
     }
 })
 
-router.post("/alterar/:id", async (req, res) => {
+router.post("/alterar/:id", validations.agenda.create, handleValidationErrors, async (req, res) => {
     try {
         const { id } = req.params
         if (!isValidISODateString(req.body.data)) {
-            return res.status(200).redirect('/agenda')
+            return res.status(400).render('alterarAgenda', { 
+                message: 'Data inválida!',
+                csrfToken: req.csrfToken()
+            })
         }
         
         await prisma.agenda.update({
@@ -109,30 +116,34 @@ router.post("/alterar/:id", async (req, res) => {
                 nome: req.body.nome,
                 data: isoDateStringToUtcDate(req.body.data),
                 hora: req.body.hora,
-                preco: parseFloat(req.body.preco)
+                preco: parseFloat(req.body.preco),
+                procedimento: req.body.procedimento
             }
         })
 
-        res.status(200).render('agenda', {message: `Entrada alterada!!`})
+        res.status(302).redirect('/agenda')
     } catch(err) {
         console.error(`Rota post /agenda/alterar: ${err.message}`)
-        res.status(200).redirect('/agenda')
+        res.status(400).render('alterarAgenda', { 
+            message: 'Erro ao atualizar agendamento',
+            csrfToken: req.csrfToken()
+        })
     }
 })
 
-router.get("/deletar/:id", async (req, res) => {
+router.post("/deletar/:id", async (req, res) => {
     try {
         const { id } = req.params
-        const produto = await prisma.agenda.delete({
+        await prisma.agenda.delete({
             where: {
                 id
             }
         })
 
-        res.status(200).render('agenda', {message: `Entrada excluida!!`})
+        res.status(302).redirect('/agenda')
     } catch (err) {
-        console.error(`Rota /agenda/deletar ${err.message}`)
-        throw new Error("Erro!!!!")
+        console.error(`Rota post /agenda/deletar: ${err.message}`)
+        res.status(500).render('error', { message: 'Erro ao deletar agendamento' })
     }
 })
 
@@ -145,21 +156,36 @@ router.post('/search', async (req, res) => {
                 orderBy: [{data: 'asc'}, {hora: 'asc'}]
             })
 
-            return res.status(200).render('agenda', {agenda: formatAgendaForView(agenda), message:``})
+            return res.status(200).render('agenda', {
+                agenda: formatAgendaForView(agenda), 
+                message:``,
+                csrfToken: req.csrfToken()
+            })
         }
 
         if (!isValidISODateString(search)) {
-            return res.status(200).render('agenda', {agenda: [], message:`Data invalida!!`})
+            return res.status(400).render('agenda', {
+                agenda: [], 
+                message:`Data inválida!`,
+                csrfToken: req.csrfToken()
+            })
         }
 
         let date = isoDateStringToUtcDate(search);
 
-        const agenda = await prisma.agenda.findMany({where:{data: date}, orderBy:[{data: 'asc'}, {hora: 'asc'}]})
+        const agenda = await prisma.agenda.findMany({
+            where:{data: date}, 
+            orderBy:[{data: 'asc'}, {hora: 'asc'}]
+        })
         
-        res.status(200).render('agenda', {agenda: formatAgendaForView(agenda), message: ``})
+        res.status(200).render('agenda', {
+            agenda: formatAgendaForView(agenda), 
+            message: ``,
+            csrfToken: req.csrfToken()
+        })
     } catch (err) {
-        console.error(`Rota post /search ${err.message}`)
-        res.status(200).render('agenda', {message:``})
+        console.error(`Rota post /agenda/search: ${err.message}`)
+        res.status(500).render('error', { message: 'Erro ao buscar agendamentos' })
     }
 })
 

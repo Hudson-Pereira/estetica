@@ -44,6 +44,7 @@
                 <span class="fechar-sobreposicao">&times;</span>
                 <section id="add">
                     <form id="form" action="add" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <label for="nome"><p>NOME</p></label>
                         <article>
                             <input type="text" id= "nome" name="nome" placeholder="Insira o nome">

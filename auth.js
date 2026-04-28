@@ -1,11 +1,25 @@
 const bcrypt = require('bcryptjs');
 const LocalStrategy = require('passport-local').Strategy;
- 
+
+// Validar variáveis de ambiente obrigatórias
+const requiredEnvVars = ['ADMIN_USERNAME', 'ADMIN_PASSWORD_HASH', 'ADMIN_EMAIL'];
+const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+
+if (missingEnvVars.length > 0) {
+  throw new Error(
+    `Variáveis de ambiente obrigatórias não configuradas: ${missingEnvVars.join(', ')}\n` +
+    `Configure as seguintes variáveis no arquivo .env:\n` +
+    `ADMIN_USERNAME=seu_usuario\n` +
+    `ADMIN_PASSWORD_HASH=seu_hash_bcrypt\n` +
+    `ADMIN_EMAIL=seu_email@example.com`
+  );
+}
+
 const users = [{ 
     _id: 1, 
-    username: process.env.ADMIN_USERNAME || "estetica",
-    password: process.env.ADMIN_PASSWORD_HASH || "$2a$06$HT.EmXYUUhNo3UQMl9APmeC0SwoGsx7FtMoAWdzGicZJ4wR1J8alW",
-    email: process.env.ADMIN_EMAIL || "admin@example.com"
+    username: process.env.ADMIN_USERNAME,
+    password: process.env.ADMIN_PASSWORD_HASH,
+    email: process.env.ADMIN_EMAIL
 }];
  
 module.exports = function(passport){

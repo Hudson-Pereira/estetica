@@ -15,6 +15,7 @@
 
         <section id="add">
             <form id="dados" action="./add" method="POST">       
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <label for="nome"><p>NOME</p></label>
                 <article>
                     <input type="text" id= "nome" name="nome" placeholder="Insira o nome do produto">

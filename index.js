@@ -3,13 +3,27 @@ const express = require("express");
 const session = require("express-session");
 const MemoryStore = require('memorystore')(session);
 const path = require("path");
+const helmet = require('helmet');
+const csrf = require('csurf');
 
 const port = process.env.PORT || 3000
-const sessionSecret = process.env.SESSION_SECRET || '123';
+
+// Validar SESSION_SECRET obrigatória
+if (!process.env.SESSION_SECRET) {
+  throw new Error(
+    'SESSION_SECRET não configurada! Configure uma chave segura no arquivo .env:\n' +
+    'SESSION_SECRET=sua_chave_secreta_segura_com_minimo_32_caracteres'
+  );
+}
+
+const sessionSecret = process.env.SESSION_SECRET;
 
 const passport = require("passport");
 
 const app = express();
+
+// Adicionar middleware de segurança
+app.use(helmet()); // Proteção de headers HTTP
 
 app.set("view engine", "ejs");
 app.set("views", "./views");
@@ -23,13 +37,29 @@ app.use(session({
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 60 * 60 * 1000}
+    cookie: { 
+        maxAge: 60 * 60 * 1000,
+        secure: process.env.NODE_ENV === 'production', // HTTPS only em produção
+        httpOnly: true, // Não acessível por JavaScript
+        sameSite: 'strict' // Proteção CSRF no cookie
+    }
 }))
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/public', express.static(path.join(__dirname, 'public')));
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: false, limit: '10mb' }));
+app.use(express.json({ limit: '10mb' }));
+
+// Proteção CSRF - aplicar após sessão
+const csrfProtection = csrf({ cookie: false });
+app.use(csrfProtection);
+
+// Injetar csrfToken em todas as respostas renderizadas
+app.use((req, res, next) => {
+    res.locals.csrfToken = req.csrfToken();
+    next();
+});
 
 function authenticationMiddleware(req, res, next) {
     if (req.isAuthenticated()) return next();
@@ -59,12 +89,23 @@ const CaixaRouter = require("./routers/caixa.routes");
 app.use("/caixa", authenticationMiddleware, CaixaRouter);
 
 const ClienteRouter = require("./routers/clientes.routes");
-app.use("/cliente", ClienteRouter)
+app.use("/cliente", authenticationMiddleware, ClienteRouter) // PROTEGIDO com autenticação
+
+// Middleware de tratamento de erros global
+app.use((err, req, res, next) => {
+    if (err.code === 'EBADCSRFTOKEN') {
+        res.status(403).render('error', { message: 'Token CSRF inválido ou expirado' });
+    } else {
+        console.error('Erro:', err.message);
+        res.status(500).render('error', { message: 'Erro interno do servidor' });
+    }
+});
 
 /*app.listen(process.env.PORT, () => {
   console.log(`Rodando em http://localhost:${port}.`);
 });*/
 //teste celular
-app.listen(port, '0.0.0.0', () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
+const host = process.env.HOST || 'localhost';
+app.listen(port, host, () => {
+  console.log(`Servidor rodando em http://${host}:${port}`);
 });

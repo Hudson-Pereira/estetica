@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport')
-
-const {PrismaClient} = require('@prisma/client');
-const prisma = new PrismaClient()
+const prisma = require('../utils/prismaClient');
 const { isoDateStringToUtcDate, formatAgendaForView } = require('../utils/date');
 
 router.get("/", async (req, res) => {
