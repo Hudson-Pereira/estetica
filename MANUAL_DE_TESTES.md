@@ -9,13 +9,15 @@
 ## 📑 Índice
 
 1. [Testes de Autenticação](#autenticação)
-2. [Testes de Clientes](#clientes)
-3. [Testes de Agenda](#agenda)
-4. [Testes de Produtos](#produtos)
-5. [Testes de Serviços](#serviços)
-6. [Testes de Caixa](#caixa)
-7. [Testes de Segurança](#segurança)
-8. [Testes de Responsividade](#responsividade)
+2. [Testes de Início](#início)
+3. [Testes de Clientes](#clientes)
+4. [Testes de Agenda](#agenda)
+5. [Testes de Produtos](#produtos)
+6. [Testes de Serviços](#serviços)
+7. [Testes de Caixa](#caixa)
+8. [Testes de Segurança](#segurança)
+9. [Testes de Variáveis de Ambiente](#variáveis-de-ambiente)
+10. [Testes de Responsividade](#responsividade)
 
 ---
 
@@ -44,7 +46,36 @@
 - [ ] Clique em "Sair" ou acesse rota de logout
 - [ ] Tente acessar página protegida
 - **Esperado:** Redirecionamento para `/login`
+### Caso de Teste 1.5: Variáveis de Ambiente Ausentes
+- [ ] Renomeie temporariamente `.env` para `.env.bak`
+- [ ] Tente iniciar o servidor (`npm start`)
+- **Esperado:** Erro indicando variáveis obrigatórias ausentes
+- [ ] Restaure o arquivo `.env`
 
+---
+
+## 🏠 Início
+
+### Caso de Teste 2.1: Acessar Dashboard
+- [ ] Faça login como admin
+- [ ] Acesse `/inicio`
+- [ ] Verifique se dashboard é exibido
+- **Esperado:** Página inicial com informações resumidas
+
+### Caso de Teste 2.2: Estatísticas do Dashboard
+- [ ] Acesse `/inicio`
+- [ ] Verifique se há:
+  - Total de clientes cadastrados
+  - Total de agendamentos do dia
+  - Total de produtos/serviços
+  - Saldo do caixa
+- **Esperado:** Dados estatísticos visíveis
+
+### Caso de Teste 2.3: Busca Global
+- [ ] Acesse `/inicio`
+- [ ] Utilize campo de busca (se existir)
+- [ ] Digite nome de cliente ou serviço
+- **Esperado:** Resultados relevantes exibidos
 ---
 
 ## 👥 Clientes
@@ -79,7 +110,10 @@
 - [ ] Clique em "Deletar" ou botão de exclusão
 - [ ] Confirme a ação
 - **Esperado:** Cliente removido da lista
-
+### Caso de Teste 2.6: Busca de Clientes
+- [ ] Na lista de clientes, utilize campo de busca
+- [ ] Digite parte do nome ou email
+- **Esperado:** Lista filtrada com resultados relevantes
 ---
 
 ## 📅 Agenda
@@ -127,6 +161,11 @@
 - [ ] Verifique se mais agendamentos carregam automaticamente
 - **Esperado:** Infinite scroll funcionando
 
+### Caso de Teste 3.8: Filtro de Agenda
+- [ ] Utilize campo de busca/filtro na agenda (se existir)
+- [ ] Filtre por cliente, serviço ou data
+- **Esperado:** Agenda exibe apenas resultados filtrados
+
 ---
 
 ## 🛍️ Produtos
@@ -161,6 +200,11 @@
 - [ ] Clique em "Deletar" em um produto
 - [ ] Confirme ação
 - **Esperado:** Produto removido da lista
+
+### Caso de Teste 4.6: Busca de Produtos
+- [ ] Utilize campo de busca na lista de produtos
+- [ ] Digite parte do nome ou descrição
+- **Esperado:** Lista filtrada com produtos relevantes
 
 ---
 
@@ -287,6 +331,40 @@
   GET /produto/delete/1
   ```
 - **Esperado:** Erro ou redirecionamento (DELETE requer POST + CSRF)
+
+### Caso de Teste 7.7: Página de Erro Genérica
+- [ ] Force um erro (acesse rota inexistente ou invalide sessão)
+- [ ] Verifique se página de erro genérica é exibida
+- **Esperado:** Página error.ejs renderizada sem detalhes técnicos
+
+---
+
+## ⚙️ Variáveis de Ambiente
+
+### Caso de Teste 9.1: SESSION_SECRET Obrigatório
+- [ ] Edite `.env` e remova/comente `SESSION_SECRET`
+- [ ] Tente iniciar o servidor
+- **Esperado:** Erro indicando SESSION_SECRET obrigatória
+
+### Caso de Teste 9.2: ADMIN_USERNAME Obrigatório
+- [ ] Edite `.env` e remova/comente `ADMIN_USERNAME`
+- [ ] Tente iniciar o servidor
+- **Esperado:** Erro indicando ADMIN_USERNAME obrigatório
+
+### Caso de Teste 9.3: ADMIN_PASSWORD_HASH Obrigatório
+- [ ] Edite `.env` e remova/comente `ADMIN_PASSWORD_HASH`
+- [ ] Tente iniciar o servidor
+- **Esperado:** Erro indicando ADMIN_PASSWORD_HASH obrigatório
+
+### Caso de Teste 9.4: Conexão com Banco de Dados
+- [ ] Inicie o servidor com `.env` correto
+- [ ] Verifique nos logs se conexão com MongoDB foi estabelecida
+- **Esperado:** Conexão bem-sucedida com banco de dados
+
+### Caso de Teste 9.5: Prisma Client Singleton
+- [ ] Faça login e navegue por várias páginas
+- [ ] Verifique nos logs se há múltiplas conexões Prisma
+- **Esperado:** Uma única instância de PrismaClient reutilizada
 
 ---
 
