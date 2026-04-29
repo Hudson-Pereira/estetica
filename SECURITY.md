@@ -1,4 +1,4 @@
-# 🔒 Guia de Segurança - Espaço Lisa Ribeiro
+# 🔒 Guia de Segurança - ServiceHub
 
 ## Configuração Inicial de Segurança
 

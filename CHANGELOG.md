@@ -1,9 +1,32 @@
-# Changelog - Espaço Lisa Ribeiro
+# Changelog - ServiceHub
 
 Todos os mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/)
 e este projeto adhere a [Semantic Versioning](https://semver.org/pt-BR/).
+
+## [0.10.0] - 2026-04-28
+
+### ✨ Adicionado
+
+#### Sistema Multi-Empresa
+- **Renomeação**: Sistema renomeado de "Espaço Lisa Ribeiro" para "ServiceHub"
+- **Nome do Pacote**: `service-hub` (anteriormente `elisangela`)
+- **Descrição**: Sistema genérico multi-empresa de gerenciamento de agendamentos
+
+#### Segurança (herdado de 3.1.0)
+- **CSRF Protection**: Tokens em todos os formulários
+- **Validação de Input**: express-validator integrado
+- **Headers de Segurança**: Helmet configurado
+- **Cookies Seguros**: httpOnly, sameSite=strict
+
+### ⚠️ Breaking Changes
+
+- DELETE agora requer POST com CSRF token
+- SESSION_SECRET é obrigatória
+- Sistema renomeado para ServiceHub
+
+---
 
 ## [3.1.0] - 2026-04-27
 

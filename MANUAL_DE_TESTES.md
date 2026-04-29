@@ -1,6 +1,6 @@
 # 📋 Manual de Testes - ServiceHub
 
-**Versão:** 4.0.0  
+**Versão:** 0.10.0  
 **Data:** 28 de abril de 2026  
 **Objetivo:** Guia completo para testes manuais do sistema
 
@@ -399,4 +399,4 @@
 
 ---
 
-**Última atualização:** 28 de abril de 2026 (v3.1.0)
+**Última atualização:** 28 de abril de 2026 (v0.10.0)

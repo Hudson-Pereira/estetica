@@ -1,6 +1,6 @@
 {
   "name": "service-hub",
-  "version": "4.0.0",
+  "version": "0.10.0",
   "description": "Sistema multi-empresa de gerenciamento de agendamentos, clientes, produtos e serviços",
   "main": "index.js",
   "type": "commonjs",
