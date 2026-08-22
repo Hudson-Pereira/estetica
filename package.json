@@ -1,6 +1,6 @@
 {
   "name": "elisangela",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Sistema de gerenciamento para estética - Espaço Lisa Ribeiro",
   "main": "index.js",
   "type": "commonjs",
