@@ -1,6 +1,6 @@
-# 🎯 INSTRUÇÕES FINAIS - v3.1.0 PRONTO PARA GITHUB
+# 🎯 INSTRUÇÕES FINAIS - v3.1.0 (PRÉ-RELEASE)
 
-**Status**: ✅ **100% COMPLETO E PRONTO**
+**Status**: ⚠️ **PARCIALMENTE VALIDADO (AINDA NÃO PRODUÇÃO)**
 
 ---
 
@@ -271,7 +271,7 @@ git push origin v3.1.0
 
 **Versão**: 3.1.0  
 **Data**: 29 de abril de 2026  
-**Status**: ✅ PRONTO PARA PRODUÇÃO  
+**Status**: ⚠️ PRÉ-RELEASE (pendente validação funcional completa)  
 **Documentação**: Completa  
 **Segurança**: Implementada  
 

@@ -5,6 +5,20 @@ Todos os mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/)
 e este projeto adhere a [Semantic Versioning](https://semver.org/pt-BR/).
 
+## [Unreleased]
+
+### 🔒 Segurança
+- Corrigido formulário de fechamento de caixa (`views/fechamento.ejs`) para incluir token CSRF.
+- Ajustado `action` do formulário de caixa para `POST /caixa`, evitando inconsistência de rota.
+
+### 📝 Documentação
+- Atualizado status dos documentos para refletir fase de pré-release (não produção).
+- Revisado `NEXT_STEPS.md` com checklist realista de hardening, confiabilidade e disponibilidade.
+- Atualizados `README_v3.1.0.md`, `SUMMARY_v3.1.0.md`, `QUICK_START.md`, `RELEASE_NOTES_v3.1.0.md` e `MANUAL_DE_TESTES.md`.
+
+### 🏷️ SemVer
+- Registrada orientação para próximos marcos em pré-release/patch (`3.1.1`, `3.1.1-rc.x`), dado que ainda não houve validação completa em produção.
+
 ## [3.1.0] - 2026-04-27
 
 ### ✨ Adicionado

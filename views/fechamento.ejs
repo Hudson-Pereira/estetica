@@ -15,7 +15,8 @@
         <h1>Caixa</h1>
 
         <section id="add">
-            <form id="dados" action="./caixa" method="POST">       
+            <form id="dados" action="/caixa" method="POST">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <label><p>DATA INICIAL</p></label>
                 <article>
                     <input type="date" id= "dataI" name="dataI">

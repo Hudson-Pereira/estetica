@@ -1,168 +1,99 @@
-# 🎯 Próximas Etapas - Atualização para v3.1.0
+# NEXT STEPS - Estado real do projeto
 
-## 📤 Publicar no GitHub
+Documento revisado para refletir o estado atual do código, sem assumir "100% pronto".
 
-Seu código está pronto para ser publicado. Execute:
+## Status atual (realista)
 
-```bash
-# Publicar o commit
-git push origin development
+- Segurança base implementada: `helmet`, `csurf`, validações e sessão.
+- Projeto ainda não validado ponta a ponta em produção.
+- Há melhorias pendentes de confiabilidade, disponibilidade e hardening.
+- A tag `v3.1.0` existe no Git, mas representa um marco técnico interno, não um release validado em produção.
 
-# Publicar a tag (cria release no GitHub)
-git push origin v3.1.0
-```
+## SemVer e tag (análise)
 
-## 📋 Checklist Pré-Deployment
+### O que existe hoje
+- `package.json`: `3.1.0`
+- Tag Git existente: `v3.1.0`
 
-### Desenvolvimento Local
-- [x] CSRF tokens adicionados em todos formulários
-- [x] Validação de entrada implementada
-- [x] Helmet e headers de segurança ativos
-- [x] PrismaClient singleton implementado
-- [x] Templates atualizados (10 arquivos)
-- [x] Routers atualizados (6 arquivos)
-- [x] Documentação criada (SECURITY.md, CHANGELOG.md)
-- [x] Versão 3.1.0 configurada
-- [x] Commits feitos e tagged
+### Avaliação
+- Como o sistema ainda não esteve estável em produção, o ideal é tratar essa fase como **pré-release**.
+- Para novos marcos, prefira:
+  - `3.1.0-rc.1` (release candidate), ou
+  - `3.1.1` para correções de bug sem novas features.
 
-### Antes de Deployar em Produção
-- [ ] Verificar que `.env` está configurado corretamente
-- [ ] Gerar SESSION_SECRET seguro
-- [ ] Gerar hash bcrypt para ADMIN_PASSWORD_HASH
-- [ ] Configurar ADMIN_USERNAME e ADMIN_EMAIL
-- [ ] Testar login com credenciais
-- [ ] Testar formulários com CSRF
-- [ ] Testar validações (enviar dados inválidos)
-- [ ] Verificar que MemoryStore é apenas em dev
-- [ ] Configurar Redis para produção (se necessário)
-- [ ] Testar HTTPS/SSL
+### Recomendação prática
+- Não apagar/alterar a tag antiga agora.
+- Criar a próxima tag somente após checklist mínimo de funcionamento completo e testes manuais concluídos.
 
-## 🔑 Gerar Credenciais Seguras
+## Checklist técnico do que já está OK
 
-### SESSION_SECRET
-```bash
-# Windows PowerShell
-$bytes = [System.Security.Cryptography.RandomNumberGenerator]::GetBytes(32)
-[System.Convert]::ToHexString($bytes).ToLower()
+### Segurança no código
+- [x] `helmet` ativo no `index.js`
+- [x] `csurf` ativo com tratamento de erro `EBADCSRFTOKEN`
+- [x] Tokens CSRF nos formulários de login, agenda, produto, serviço e cliente
+- [x] Formulário de fechamento de caixa com token CSRF
+- [x] Rotas de deleção usando `POST` (não `GET`)
+- [x] `SESSION_SECRET` obrigatória no startup
+- [x] Validações com `express-validator` em rotas principais
+- [x] Prisma singleton em `utils/prismaClient.js`
 
-# Ou use Node.js
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
+### Estrutura
+- [x] 7 routers no projeto (`agenda`, `caixa`, `clientes`, `inicio`, `login`, `produto`, `servico`)
+- [x] Documentação de apoio presente (`SECURITY.md`, `CHANGELOG.md`, `CSRF_TOKENS.md`, etc.)
 
-### ADMIN_PASSWORD_HASH (Bcrypt)
-```bash
-# Opção 1: Online - https://bcrypt-generator.com/
-# Cole sua senha (mínimo 12 caracteres) e clique "Hash"
+## Pendências antes de considerar release estável
 
-# Opção 2: Node.js
-node -e "require('bcryptjs').hash('sua_senha_segura_12+chars', 10, (err, hash) => console.log(hash))"
+### Segurança e hardening
+- [x] Adicionar rate limit nas rotas de login e sensíveis
+- [ ] Definir política de lockout/backoff para tentativas de login
+- [ ] Revisar uso de `csurf` (pacote legada) e planejar alternativa futura
 
-# Opção 3: CLI
-npm install -g bcrypt-cli
-bcrypt 'sua_senha_segura'
-```
+### Confiabilidade
+- [x] Padronizar tratamento de erro em `clientes.routes.js`
+- [ ] Garantir respostas consistentes de erro em todas as rotas
+- [ ] Criar smoke test manual mínimo para fluxo principal
 
-## 📝 Estrutura de Versão
+### Disponibilidade
+- [x] Adicionar endpoint de healthcheck (`/healthz`)
+- [ ] Definir strategy de readiness para deploy
+- [ ] Trocar sessão para Redis em produção (evitar `MemoryStore` em ambiente produtivo)
 
-### Semântica Adotada: SemVer 2.0.0
+### Funcionalidade (go-live)
+- [ ] Validar fluxo completo: login -> agenda -> produto -> serviço -> caixa
+- [ ] Validar permissões e redirecionamentos de autenticação
+- [ ] Executar checklist manual completo no `MANUAL_DE_TESTES.md`
 
-**Histórico**:
-- `3.0.0` - Versão anterior (base)
-- `3.1.0` - **ATUAL** - Melhorias de segurança (Minor)
-- `4.0.0-beta` / `v0.10.0` - Futuros (check git log para contexto)
-
-**Próximas versões**:
-- `3.1.1` - Bugfixes de segurança (Patch)
-- `3.2.0` - Novas features (Minor)
-- `4.0.0` - Grandes mudanças (Major)
-
-## 🔍 Arquivos Importantíssimos
-
-### Segurança
-- ✅ `SECURITY.md` - Leia antes de deployar
-- ✅ `CSRF_TOKENS.md` - Como usar tokens
-- ✅ `.env.example` - Variáveis obrigatórias
-
-### Documentação
-- ✅ `CHANGELOG.md` - Histórico de mudanças
-- ✅ `RELEASE_NOTES_v3.1.0.md` - Notas desta versão
-
-### Código Core
-- ✅ `utils/prismaClient.js` - Singleton
-- ✅ `utils/validators.js` - Validações
-
-## 🚨 Breaking Changes (Importante!)
-
-1. **DELETE agora usa POST**
-   ```javascript
-   // Antes: <a href="/produto/deletar/123">Deletar</a>
-   // Agora: <form method="POST" action="/produto/deletar/123">
-   //          <input type="hidden" name="_csrf" value="...">
-   //          <button>Deletar</button>
-   //        </form>
-   ```
-
-2. **SESSION_SECRET é obrigatória**
-   - Sem `.env` configurado, aplicação não inicia
-
-3. **Variáveis de Ambiente Obrigatórias**
-   - ADMIN_USERNAME
-   - ADMIN_PASSWORD_HASH
-   - ADMIN_EMAIL
-   - SESSION_SECRET
-
-## ✅ Testes Rápidos
+## Verificação local rápida
 
 ```bash
-# Iniciar desenvolvimento
-npm start
-# ou
 npm run start:dev
-
-# Verificar linting (opcional - configure conforme necessário)
-# npm run lint
-
-# Testar unitário (opcional - configure conforme necessário)
-# npm test
 ```
 
-**Testes Manuais Essenciais**:
-1. [ ] Página de login carrega
-2. [ ] Login com credenciais válidas funciona
-3. [ ] Adicionar Produto - validações funcionam
-4. [ ] Deletar Produto - confirmação aparece, POST é enviado
-5. [ ] Agendar - validações de data/hora funcionam
-6. [ ] Buscar agendamentos por data funciona
+Testes manuais mínimos:
+1. [ ] Login válido e inválido
+2. [ ] Criar/editar/excluir produto
+3. [ ] Criar/editar/excluir serviço
+4. [ ] Criar/editar/excluir agendamento
+5. [ ] Buscar agenda por data
+6. [ ] Fechamento de caixa com intervalo de datas
 
-## 📞 Suporte
+## Preparação de produção
 
-### Dúvidas sobre Segurança
-Veja `SECURITY.md`
+- [ ] Configurar `.env` com valores reais seguros
+- [ ] Gerar `SESSION_SECRET` forte (32+ bytes)
+- [ ] Gerar `ADMIN_PASSWORD_HASH` com bcrypt
+- [ ] Habilitar HTTPS/SSL no ambiente final
+- [ ] Configurar monitoramento de erros e logs
 
-### Dúvidas sobre CSRF
-Veja `CSRF_TOKENS.md`
+## Quando liberar nova versão
 
-### Dúvidas sobre Mudanças
-Veja `CHANGELOG.md` ou `RELEASE_NOTES_v3.1.0.md`
+Critérios recomendados:
+- Sem erros críticos nos fluxos principais
+- Checklist manual mínimo 100% concluído
+- Deploy de teste realizado com sucesso
 
-## 🎉 Conclusão
-
-A versão **3.1.0** está **100% pronta para ser publicada** no GitHub!
-
-**Status Final**:
-- ✅ Código seguro
-- ✅ Documentação completa
-- ✅ Commits bem organizados
-- ✅ Tag criada
-- ✅ Pronto para `git push`
-
----
-
-**Próximo passo**: 
-```bash
-git push origin development
-git push origin v3.1.0
-```
-
-Isso criará uma **Release** automática no GitHub com as notas!
+Versionamento sugerido:
+- Correções imediatas: `3.1.1`
+- Pré-release validável: `3.1.1-rc.1`
+- Release estável após validação real: `3.2.0` (se incluir melhorias novas) ou `3.1.1` (se apenas bugfix)
 

@@ -2,7 +2,7 @@
 
 ## ⚡ EM 30 SEGUNDOS
 
-Se você só quer publicar agora:
+Se você só quer enviar o estado atual para o GitHub:
 
 ```bash
 cd d:\Programação\estetica
@@ -10,7 +10,7 @@ git push origin development
 git push origin v3.1.0
 ```
 
-Pronto! Seus commits e tags estão no GitHub.
+Pronto! Seus commits e tags sobem para o GitHub.
 
 ---
 
@@ -99,7 +99,7 @@ git tag -l v3.1.0
 ## 📝 MUDANÇAS PRINCIPAIS
 
 ### Segurança ✅
-- CSRF tokens em todos formulários
+- CSRF tokens nos formulários principais
 - Validação de entrada
 - Headers de segurança (Helmet)
 - Cookies seguros
@@ -141,10 +141,10 @@ Veja `NEXT_STEPS.md` para instruções completas.
 ## 🎉 CONCLUSÃO
 
 Seu projeto está:
-- ✅ 100% seguro
-- ✅ Totalmente documentado
-- ✅ Corretamente versionado (3.1.0)
-- ✅ Pronto para GitHub
+- ✅ Com boa base de segurança
+- ✅ Bem documentado para evolução
+- ⚠️ Ainda em fase de estabilização funcional
+- ⚠️ Tag `v3.1.0` existente, mas sem validação completa em produção
 
 **Agora execute**:
 ```bash

@@ -1,5 +1,7 @@
 # 🔒 Guia de Segurança - ServiceHub
 
+> Estado atual: base de segurança implementada, porém o projeto ainda está em fase de estabilização e não validado como "produção pronta".
+
 ## Configuração Inicial de Segurança
 
 ### 1. Variáveis de Ambiente Obrigatórias
@@ -126,6 +128,11 @@ Ou use um gerador UUID: https://www.uuidgenerator.net/
    - Implemente logging estruturado (Winston, Pino)
    - Configure alertas para erros
    - Monitore tentativas de login
+
+7. **Hardening Recomendado (pendente)**
+   - Adicionar rate limiting nas rotas de autenticação e endpoints sensíveis
+   - Implementar lockout/backoff para tentativas de login
+   - Adicionar endpoint de healthcheck/readiness para operação
 
 ## 📋 Checklist de Segurança
 

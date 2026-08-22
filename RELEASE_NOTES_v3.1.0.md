@@ -266,5 +266,5 @@ git push origin v3.1.0
 
 ---
 
-**Status**: ✅ Pronto para Produção (após configuração de .env)
+**Status**: ⚠️ Pré-release técnico (ainda sem validação completa de produção)
 

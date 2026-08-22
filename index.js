@@ -5,6 +5,7 @@ const MemoryStore = require('memorystore')(session);
 const path = require("path");
 const helmet = require('helmet');
 const csrf = require('csurf');
+const rateLimit = require('express-rate-limit');
 
 const port = process.env.PORT || 3000
 
@@ -16,17 +17,53 @@ if (!process.env.SESSION_SECRET) {
   );
 }
 
-const sessionSecret = process.env.SESSION_SECRET;
+const sessionSecret = (process.env.SESSION_SECRET || '').trim();
+if (sessionSecret.length < 32) {
+  throw new Error('SESSION_SECRET deve ter no mínimo 32 caracteres.');
+}
 
 const passport = require("passport");
 
 const app = express();
+app.disable('x-powered-by');
+
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+}
 
 // Adicionar middleware de segurança
 app.use(helmet()); // Proteção de headers HTTP
 
+const defaultWindowMs = 15 * 60 * 1000;
+const defaultMaxRequests = 300;
+const rateLimitWindowMs = Number(process.env.RATE_LIMIT_WINDOW_MS || defaultWindowMs);
+const rateLimitMaxRequests = Number(process.env.RATE_LIMIT_MAX || defaultMaxRequests);
+
+const globalLimiter = rateLimit({
+    windowMs: Number.isFinite(rateLimitWindowMs) ? rateLimitWindowMs : defaultWindowMs,
+    max: Number.isFinite(rateLimitMaxRequests) ? rateLimitMaxRequests : defaultMaxRequests,
+    standardHeaders: true,
+    legacyHeaders: false
+});
+app.use(globalLimiter);
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: 'Muitas tentativas de login. Aguarde e tente novamente.'
+});
+
 app.set("view engine", "ejs");
 app.set("views", "./views");
+
+if (process.env.NODE_ENV === 'production' && process.env.ALLOW_MEMORY_STORE_IN_PRODUCTION !== 'true') {
+    throw new Error(
+        'MemoryStore não deve ser usado em produção. Configure Redis/Mongo para sessão ' +
+        'ou defina ALLOW_MEMORY_STORE_IN_PRODUCTION=true apenas temporariamente.'
+    );
+}
 
 require('./auth')(passport);
 app.use(session({
@@ -68,10 +105,14 @@ function authenticationMiddleware(req, res, next) {
 
 app.get('/', (req, res) => {
     res.redirect('/cliente')
-});//TODO: depois de pronta a tela sobre, mudar para ela o redirect
+});
+
+app.get('/healthz', (req, res) => {
+    res.status(200).json({ status: 'ok', uptime: process.uptime() });
+});
 
 const LoginRouter = require("./routers/login.routes");
-app.use("/login", LoginRouter);
+app.use("/login", loginLimiter, LoginRouter);
 
 const InicioRouter = require("./routers/inicio.routes")
 app.use('/admin', authenticationMiddleware, InicioRouter)
@@ -89,7 +130,11 @@ const CaixaRouter = require("./routers/caixa.routes");
 app.use("/caixa", authenticationMiddleware, CaixaRouter);
 
 const ClienteRouter = require("./routers/clientes.routes");
-app.use("/cliente", authenticationMiddleware, ClienteRouter) // PROTEGIDO com autenticação
+app.use("/cliente", ClienteRouter)
+
+app.use((req, res) => {
+    res.status(404).render('error', { message: 'Página não encontrada' });
+});
 
 // Middleware de tratamento de erros global
 app.use((err, req, res, next) => {

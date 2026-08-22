@@ -9,6 +9,11 @@ const {
     getTomorrowISODateString
 } = require('../utils/date');
 
+function authenticationMiddleware(req, res, next) {
+    if (req.isAuthenticated()) return next();
+    return res.redirect('/login?fail=true');
+}
+
 function filtrarAgendaProximaSemana(agenda) {
     const inicioHoje = moment.utc().startOf('day');
     const fimSemana = moment.utc().add(7, 'days').endOf('day');
@@ -25,7 +30,7 @@ router.get('/', async (req, res) => {
         // res.status(200).render(`clientes/home`, {message:``})
     } catch (err) {
         console.error(`Rota /sobre: ${err.message}`);
-      throw new Error("Erro!!!!");
+        res.status(500).render('error', { message: 'Erro ao carregar página do cliente' });
     }
 })
 
@@ -47,20 +52,20 @@ router.get('/agenda', async (req, res) => {
         })
     } catch (err) {
         console.error(`Rota /cliente/agenda: ${err.message}`);
-      throw new Error("Erro!!!!");
+        res.status(500).render('error', { message: 'Erro ao carregar agenda do cliente' });
     }
 })
 
-router.get('/agenda/add', async (req, res) => {
+router.get('/agenda/add', authenticationMiddleware, async (req, res) => {
     try {
         res.status(200).render('clientes/addAgenda', {message:``, minDate: getTomorrowISODateString()})
     } catch (err) {
         console.error(`Rota /cliente/agenda/add: ${err.message}`);
-      throw new Error("Erro!!!!");
+        res.status(500).render('error', { message: 'Erro ao carregar formulário de agenda' });
     }
 })
 
-router.post('/agenda/add', async (req, res) => {
+router.post('/agenda/add', authenticationMiddleware, async (req, res) => {
     try {
         
         let { nome, data, hora, preco, procedimento } = req.body
@@ -109,7 +114,7 @@ router.post('/agenda/add', async (req, res) => {
         res.status(200).render('clientes/agenda', {agenda: formatAgendaForView(agendaFiltrada), message: `Agendamento concluido!!`})
     } catch (err) {
         console.error(`Rota /cliente/add: ${err.message}`);
-      throw new Error("Erro!!!!");
+        res.status(500).render('error', { message: 'Erro ao concluir agendamento' });
     }
 })
 
@@ -123,7 +128,7 @@ router.get('/infos', async (req, res) => {
         })
     } catch (err) {
         console.error(`Rota /infos: ${err.message}`);
-      throw new Error("Erro!!!!");
+        res.status(500).render('error', { message: 'Erro ao carregar informações' });
     }
 })
 //TODO: criar funcao externa/exportada para formatar data e filtrar agenda

@@ -51,12 +51,13 @@ module.exports = function(passport){
         try {
             const user = findUsers(username);
 
-            if (!user) { return done(null, false) }
+            if (!user) { return done(null, false); }
             
-            const isValid = bcrypt.compareSync(password, user.password);
-            if (!isValid) return done(null, false);
-            
-            return done(null, user);
+            bcrypt.compare(password, user.password, (err, isValid) => {
+                if (err) { return done(err); }
+                if (!isValid) { return done(null, false); }
+                return done(null, user);
+            });
         } catch (err) {
             done(err, false);
         }
